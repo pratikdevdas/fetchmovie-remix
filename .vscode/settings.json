@@ -1,0 +1,10 @@
+{
+  "emmet.triggerExpansionOnTab": true,
+  "editor.codeActionsOnSave": {
+    //eslint-runs-automatically-on-save also shows ts changes in extension
+    "source.fixAll.eslint": true
+  },
+  // for cspell extension
+  "cSpell.diagnosticLevel": "Hint",
+  "editor.formatOnSave": true
+}
