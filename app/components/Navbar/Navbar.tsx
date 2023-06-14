@@ -1,10 +1,12 @@
 import styled from 'styled-components'
-
+import PopoverWrapper from './Popover'
 export default function Navbar() {
   return (
     <NavContainer>
       <NavWrapper>
-        <div></div>
+        <LogoHeader>ds</LogoHeader>
+        <LogoHeader>sf</LogoHeader>
+        <PopoverWrapper />
       </NavWrapper>
     </NavContainer>
   )
@@ -17,5 +19,12 @@ const NavContainer = styled.div`
 
 const NavWrapper = styled.div`
   max-width: 1280px;
+  height: 72px;
   display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0 auto;
+  color: white;
 `
+
+const LogoHeader = styled.h1``

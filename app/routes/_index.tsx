@@ -1,5 +1,5 @@
 import type { V2_MetaFunction } from '@remix-run/node'
-import Navbar from '~/components/Home/Navbar'
+import Navbar from '~/components/Navbar/Navbar'
 
 export const meta: V2_MetaFunction = () => {
   return [
