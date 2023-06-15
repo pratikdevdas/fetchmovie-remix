@@ -16,6 +16,18 @@ export const links: LinksFunction = () => [
         {
           rel: 'stylesheet',
           href: 'https://unpkg.com/modern-css-reset@1.4.0/dist/reset.min.css'
+        },
+        {
+          rel: 'preconnect',
+          href: 'https://fonts.googleapis.com'
+        },
+        {
+          rel: 'preconnect',
+          href: 'https://fonts.gstatic.com"'
+        },
+        {
+          rel: 'stylesheet',
+          href: 'https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@700;800&display=swap'
         }
       ])
 ]
@@ -30,7 +42,7 @@ export default function App() {
         <Links />
         {typeof document === 'undefined' ? '__STYLES__' : null}
       </head>
-      <body>
+      <body style={{ background: '#0c102c' }}>
         <Outlet />
         <ScrollRestoration />
         <Scripts />

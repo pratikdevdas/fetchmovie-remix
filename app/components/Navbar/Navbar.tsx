@@ -1,12 +1,16 @@
 import styled from 'styled-components'
 import PopoverWrapper from './Popover'
+import TabCarousel from './TabCarousel'
 export default function Navbar() {
   return (
     <NavContainer>
       <NavWrapper>
-        <LogoHeader>ds</LogoHeader>
+        <LogoHeader>The Movie App</LogoHeader>
         <LogoHeader>sf</LogoHeader>
         <PopoverWrapper />
+      </NavWrapper>
+      <NavWrapper>
+        <TabCarousel></TabCarousel>
       </NavWrapper>
     </NavContainer>
   )
@@ -27,4 +31,6 @@ const NavWrapper = styled.div`
   color: white;
 `
 
-const LogoHeader = styled.h1``
+const LogoHeader = styled.h1`
+  font-family: 'Nunito Sans', sans-serif;
+`
