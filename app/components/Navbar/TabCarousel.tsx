@@ -2,89 +2,11 @@ import { styled } from 'styled-components'
 import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
 import { useLoaderData } from '@remix-run/react'
-import { json } from '@remix-run/node'
+import type { loader } from '~/routes/_index'
 
-// const getData = async () => {
-//   const response = await fetch('https://api.themoviedb.org/3/discover/movie?api_key=468d413c44d12876b4f3a40147ab3946&language=en-US&sort_by=popularity.desc&include_adult=false&include_video=false&page=1')
-// 	console.log(response)
-//   return [{}]
-// }
-
-// export async function loader() {
-//   const data = await getData()
-//   console.log(data)
-//   return json(data)
-// }
-async function getPosts() {
-	return [
-	  {
-		slug: 'my-first-post',
-		title: 'My First Post',
-	  },
-	  {
-		slug: '90s-mixtape',
-		title: 'A Mixtape I Made Just For You',
-	  },
-	]
-  }
-
-  export const loader = async () => {
-	return json({
-	  posts: await getPosts(),
-	})
-  }
-
-// const data ={
-// 	'resources': [
-// 	  {
-// 		'title': 'Find me on Twitter',
-// 		'link': 'https://twitter.com/kendalmintcode',
-// 		'imageUrl': 'https://placeimg.com/300/300/any'
-// 	  },
-// 	  {
-// 		'title': 'Welcome to Ark Labs',
-// 		'link': 'https://ark-labs.co.uk',
-// 		'imageUrl': 'https://placeimg.com/300/300/animals'
-// 	  },
-// 	  {
-// 		'title': 'Some sort of third title',
-// 		'link': 'https://twitter.com/kendalmintcode',
-// 		'imageUrl': 'https://placeimg.com/300/300/architecture'
-// 	  },
-// 	  {
-// 		'title': 'A personal site perhaps?',
-// 		'link': 'https://robkendal.co.uk',
-// 		'imageUrl': 'https://placeimg.com/300/300/nature'
-// 	  },
-// 	  {
-// 		'title': 'Super item number five',
-// 		'link': 'https://twitter.com/kendalmintcode',
-// 		'imageUrl': 'https://placeimg.com/300/300/people'
-// 	  },
-// 	  {
-// 		'title': 'Super item number six',
-// 		'link': 'https://twitter.com/kendalmintcode',
-// 		'imageUrl': 'https://placeimg.com/300/300/tech'
-// 	  },
-// 	  {
-// 		'title': 'Super item number seven',
-// 		'link': 'https://twitter.com/kendalmintcode',
-// 		'imageUrl': 'https://placeimg.com/300/300/animals'
-// 	  },
-// 	  {
-// 		'title': 'Super item number eight',
-// 		'link': 'https://twitter.com/kendalmintcode',
-// 		'imageUrl': 'https://placeimg.com/300/300/people'
-// 	  },
-// 	  {
-// 		'title': 'Super item number the last',
-// 		'link': 'https://twitter.com/kendalmintcode',
-// 		'imageUrl': 'https://placeimg.com/300/300/tech'
-// 	  }
-// 	]
-//   }
 const TabCarousel = () => {
-  const posts = useLoaderData<typeof loader>()
+  const { movies } = useLoaderData<typeof loader>()
+  console.log(movies)
   const responsive = {
     desktop: {
       breakpoint: { max: 3000, min: 1024 },
@@ -102,9 +24,6 @@ const TabCarousel = () => {
       slidesToSlide: 1 // optional, default to 1.
     }
   }
-
-  console.log(posts)
-
 
   return (
     <TabWrapper>
@@ -155,10 +74,4 @@ const CategoryWrapper = styled.div`
 const FilterButton = styled.button`
   width: 10%;
 `
-/* const ChevronLeft = styled.div``
-const ChevronRight = styled.div``
-const Categories = styled.div`
-  display: flex;
-`
-` */
 const Category = styled.div``
