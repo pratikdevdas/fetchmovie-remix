@@ -1,12 +1,8 @@
 import { styled } from 'styled-components'
 import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
-import { useLoaderData } from '@remix-run/react'
-import type { loader } from '~/routes/_index'
 
 const TabCarousel = () => {
-  const { movies } = useLoaderData<typeof loader>()
-  console.log(movies)
   const responsive = {
     desktop: {
       breakpoint: { max: 3000, min: 1024 },
@@ -44,15 +40,6 @@ const TabCarousel = () => {
           customTransition="all .7s ease-out"
         >
           <Category>Item 1</Category>
-          <div>Item 2</div>
-          <div>Item 3</div>
-          <Category>Item 4</Category>
-          <div>Item 5</div>
-          <div>Item 6</div>
-          <div>Item 7</div>
-          <div>Item 8</div>
-          <div>Item 9</div>
-          <div>Item 10</div>
         </Carousel>
       </CategoryWrapper>
       <FilterButton>Eladio</FilterButton>
