@@ -1,6 +1,5 @@
 import { json, type V2_MetaFunction } from '@remix-run/node'
 import Navbar from '~/components/Navbar/Navbar'
-import { useLoaderData } from '@remix-run/react'
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -27,22 +26,20 @@ const getData = async () => {
   try {
     const response = await fetch(url, options)
     const { genres } = await response.json()
-    return  genres
+    return genres
   } catch (error) {
     console.log(error)
   }
 }
 
 export async function loader() {
-  const genres:Genres[]  = await getData()
+  const genres: Genres[] = await getData()
   return json(genres)
 }
 
 export default function Index() {
-  const genres = useLoaderData<typeof loader>()
   return (
     <div>
-      {genres.map((g) => <div key={g.id}>{g.id}</div>)}
       <Navbar />
     </div>
   )
