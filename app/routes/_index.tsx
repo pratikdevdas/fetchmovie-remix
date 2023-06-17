@@ -39,7 +39,7 @@ export async function loader() {
 
 export default function Index() {
   return (
-    <div>
+    <div className="border">
       <Navbar />
     </div>
   )

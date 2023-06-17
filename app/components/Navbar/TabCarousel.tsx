@@ -36,6 +36,7 @@ const TabCarousel = () => {
           keyBoardControl={true}
           autoPlaySpeed={3000}
           removeArrowOnDeviceType={['tablet', 'mobile']}
+          containerClass="react-multi-carousel-list"
         >
           {genres.map((g) => (
             <Category key={g.id}>{g.name}</Category>
@@ -62,8 +63,4 @@ const CategoryWrapper = styled.div`
 const FilterButton = styled.button`
   width: 10%;
 `
-const Category = styled.div`
-  height: 72px;
-  display: flex;
-  align-items: center;
-`
+const Category = styled.div``
