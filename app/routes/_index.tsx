@@ -1,4 +1,5 @@
-import { json, type V2_MetaFunction } from '@remix-run/node'
+import { type V2_MetaFunction } from '@remix-run/node'
+import { useLoaderData } from '@remix-run/react'
 import Navbar from '~/components/Navbar/Navbar'
 
 export const meta: V2_MetaFunction = () => {
@@ -8,12 +9,23 @@ export const meta: V2_MetaFunction = () => {
   ]
 }
 
-interface Genres {
+export interface Genres {
   id: number
   name: string
 }
+export interface Movie {
+  id: number
+  original_title:string
+}
+export interface Movies {
+  page: number
+  results:Movie[]
+}
 
-const url = 'https://api.themoviedb.org/3/genre/movie/list?language=en'
+
+const genreUrl = 'https://api.themoviedb.org/3/genre/movie/list?language=en'
+const moviesUrl =
+  'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=false&language=en-US&page=1&sort_by=popularity.desc'
 const options = {
   method: 'GET',
   headers: {
@@ -22,9 +34,9 @@ const options = {
   }
 }
 
-const getData = async () => {
+const getMovieGenreList = async () => {
   try {
-    const response = await fetch(url, options)
+    const response = await fetch(genreUrl, options)
     const { genres } = await response.json()
     return genres
   } catch (error) {
@@ -32,15 +44,31 @@ const getData = async () => {
   }
 }
 
+const getMovieList = async () => {
+  try {
+    const response = await fetch(moviesUrl, options)
+    const movies = await response.json()
+    return movies
+  } catch (error) {
+    console.log(error)
+  }
+}
 export async function loader() {
-  const genres: Genres[] = await getData()
-  return json(genres)
+  const genres: Genres[] = await getMovieGenreList()
+  const movies: Movies = await getMovieList()
+  console.log(movies)
+  console.log('^&(&(*&(*&')
+  return { genres, movies: movies.results }
 }
 
 export default function Index() {
+  const { movies } = useLoaderData<typeof loader>()
   return (
     <div className="border">
       <Navbar />
+      {movies.map((g) => (
+        <div key={g.id}>{g.original_title}</div>
+      ))}
     </div>
   )
 }

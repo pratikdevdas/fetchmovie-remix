@@ -50,7 +50,7 @@ export default function App() {
         <Links />
         {typeof document === 'undefined' ? '__STYLES__' : null}
       </head>
-      <body style={{ background: '#0c102c' }}>
+      <body style={{ background: '#0C0E13' }}>
         <Outlet />
         <ScrollRestoration />
         <Scripts />

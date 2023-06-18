@@ -1,6 +1,7 @@
 import styled from 'styled-components'
 import PopoverWrapper from './Popover'
 import TabCarousel from './TabCarousel'
+
 export default function Navbar() {
   return (
     <NavContainer>
@@ -18,7 +19,6 @@ export default function Navbar() {
 
 const NavContainer = styled.div`
   width: 100%;
-  background-color: #0c102c;
 `
 
 const NavWrapper = styled.div`

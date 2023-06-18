@@ -1,11 +1,12 @@
 import { styled } from 'styled-components'
 import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
-import { useLoaderData } from '@remix-run/react'
 import type { loader } from '~/routes/_index'
+import { useLoaderData } from '@remix-run/react'
 
 const TabCarousel = () => {
-  const genres = useLoaderData<typeof loader>()
+  const { genres } = useLoaderData<typeof loader>()
+
   const responsive = {
     desktop: {
       breakpoint: { max: 3000, min: 720 },
