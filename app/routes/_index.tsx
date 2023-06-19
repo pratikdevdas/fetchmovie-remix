@@ -1,11 +1,13 @@
+import { useEffect, useRef, useState } from 'react'
+import type { LoaderArgs } from '@remix-run/node'
 import { type V2_MetaFunction } from '@remix-run/node'
-import { useLoaderData } from '@remix-run/react'
+import { useFetcher, useLoaderData } from '@remix-run/react'
 import { styled } from 'styled-components'
 import Navbar from '~/components/Navbar/Navbar'
 
 export const meta: V2_MetaFunction = () => {
   return [
-    { title: 'New Remix App' },
+    { title: 'The Movie App' },
     { name: 'description', content: 'Welcome to Remix!' }
   ]
 }
@@ -26,8 +28,7 @@ export interface Movies {
 }
 
 const genreUrl = 'https://api.themoviedb.org/3/genre/movie/list?language=en'
-const moviesUrl =
-  'https://api.themoviedb.org/3/discover/movie?include_adult=false&include_video=true&language=en-US&page=5'
+
 const options = {
   method: 'GET',
   headers: {
@@ -46,41 +47,105 @@ const getMovieGenreList = async () => {
   }
 }
 
-const getMovieList = async () => {
+const getMovieList = async (page: number) => {
   try {
-    const response = await fetch(moviesUrl, options)
+    const response = await fetch(
+      `https://api.themoviedb.org/3/discover/movie?language=en-US&page=${page}`,
+      options
+    )
     const movies = await response.json()
     return movies
   } catch (error) {
     console.log(error)
   }
 }
-export async function loader() {
+export async function loader({ request }: LoaderArgs) {
+  const url = new URL(request.url)
+  const page = url.searchParams.get('page') || 1
+
   const genres: Genres[] = await getMovieGenreList()
-  const movies: Movies = await getMovieList()
-  console.log(movies)
+  const movies: Movies = await getMovieList(Number(page))
   console.log('^&(&(*&(*&')
-  return { genres, movies: movies.results }
+  return { genres, movies: movies.results, page : Number(page) }
+}
+
+const MoviesInfiniteScroll = (props: {
+  children: any
+  loading: boolean
+  loadNext: () => void
+}) => {
+  const { children, loading, loadNext } = props
+
+  const scrollRef = useRef(loadNext)
+
+  useEffect(() => {
+    scrollRef.current = loadNext
+  }, [loadNext])
+  const onScroll = () => {
+    const scroll = window.scrollY + window.innerHeight
+    const documentHeight = document.documentElement.scrollHeight
+    const scrollEnds = scroll === documentHeight
+
+    if (scrollEnds && !loading) {
+      scrollRef.current()
+    }
+  }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.addEventListener('scroll', onScroll)
+    }
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+    }
+  })
+  return <div>{children}</div>
 }
 
 export default function Index() {
-  const { movies } = useLoaderData<typeof loader>()
+  const { movies, page } = useLoaderData<typeof loader>()
+  const fetcher = useFetcher<typeof loader>()
+  console.log(movies)
+  const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
+  console.log(fetcher)
+
+  console.log(page)
+  useEffect(() => {
+    if (!fetcher.data || fetcher.state === 'loading') {
+      return
+    }
+
+    if (fetcher.data) {
+      const newItems = fetcher.data.movies
+      setRenderMovies((prevAssets) => [...prevAssets, ...newItems])
+    }
+  }, [fetcher.data])
+
   return (
     <Home className="border">
       <Navbar />
-      <MovieCardWrapper>
-        {movies.map((m) => (
-          <MovieCard key={m.id}>
-            <img
-              src={`https://image.tmdb.org/t/p/original/${m.poster_path}`}
-              alt="img mov"
-            />
-            <MovieWriteup>
-              <h4>{m.original_title}</h4>
-            </MovieWriteup>
-          </MovieCard>
-        ))}
-      </MovieCardWrapper>
+      <MoviesInfiniteScroll
+        loadNext={() => {
+          const pageToFetch = fetcher.data ? fetcher.data.page + 1 : page + 1
+          const query = `?index&page=${pageToFetch}`
+          fetcher.load(query)
+        }}
+        loading={fetcher.state === 'loading'}
+      >
+        <MovieCardWrapper>
+          {renderMovies.map((m) => (
+            <MovieCard key={m.id}>
+              <img
+                src={`https://image.tmdb.org/t/p/original/${m.poster_path}`}
+                alt="img mov"
+              />
+              <MovieWriteup>
+                <h4>{m.original_title}</h4>
+              </MovieWriteup>
+            </MovieCard>
+          ))}
+        </MovieCardWrapper>
+      </MoviesInfiniteScroll>
     </Home>
   )
 }
