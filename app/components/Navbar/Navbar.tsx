@@ -22,12 +22,10 @@ const NavContainer = styled.div`
 `
 
 const NavWrapper = styled.div`
-  max-width: 1280px;
   height: 72px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0 auto;
   color: white;
 `
 
