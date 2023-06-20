@@ -8,7 +8,8 @@ import {
   Scripts,
   ScrollRestoration
 } from '@remix-run/react'
-import misc from './misc.css'
+import { createHead } from 'remix-island'
+import misc from './styles/misc.css'
 
 export const links: LinksFunction = () => {
   return [
@@ -40,22 +41,25 @@ export const links: LinksFunction = () => {
   ]
 }
 
+
+export const Head = createHead(() => (
+  <>
+    <Meta />
+    <Links />
+    {typeof document === 'undefined'
+          ? '__STYLES__'
+          : null}
+  </>
+  ))
+
 export default function App() {
   return (
-    <html lang="en">
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <Meta />
-        <Links />
-        {typeof document === 'undefined' ? '__STYLES__' : null}
-      </head>
-      <body style={{ background: '#0C0E13' }}>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
-      </body>
-    </html>
+    <>
+      <Head />
+      <Outlet />
+      <ScrollRestoration />
+      <Scripts />
+      <LiveReload />
+    </>
   )
 }
