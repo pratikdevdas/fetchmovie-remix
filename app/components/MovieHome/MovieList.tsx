@@ -36,7 +36,16 @@ export default function MovieList() {
               alt="img mov"
             />
             <MovieWriteup>
-              <h4>{m.original_title}</h4>
+              <h4>{m.title}</h4>
+              <p>
+                {m.overview.substring(0, 170)}
+                <span> ...readmore </span>
+              </p>
+              <p>Rating: {m.vote_average}</p>
+              <CardBottom>
+                <WatchButton>watch trailer</WatchButton>
+                <WishListButton>wishlist</WishListButton>
+              </CardBottom>
             </MovieWriteup>
           </MovieCard>
         ))}
@@ -45,6 +54,12 @@ export default function MovieList() {
   )
 }
 
+const CardBottom = styled.div`
+  display: flex;
+  gap: 5px;
+`
+const WatchButton = styled.button``
+const WishListButton = styled.button``
 const MovieCardWrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -74,11 +89,22 @@ const MovieWriteup = styled.div`
   height: 100%;
   transition: all 0.7s ease-in-out;
   padding: 20px;
-  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida  Grande',
+  font-family: 'Nunito Sans', 'Nunito Sans Regular', 'Lucida  Grande',
     'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   font-weight: semi-bold;
   box-sizing: border-box;
   clip-path: circle(10% at 100% 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  & p {
+    color: #e3e5e8b8;
+    font-size: 12px;
+    padding-block-start: 10px;
+    font-weight: lighter;
+    flex: 1 1 100%;
+  }
 `
 
 const MovieCard = styled.div`
