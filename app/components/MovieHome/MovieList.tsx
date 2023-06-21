@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import type { Movie, loader } from '~/routes/_index'
 import styled from 'styled-components'
 import MoviesInfiniteScroll from './InfiniteScroller'
+
 export default function MovieList() {
   const { movies, page } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
@@ -22,22 +23,21 @@ export default function MovieList() {
 
   return (
     <MoviesContainer>
-
       <MoviesInfiniteScroll
         loadNext={() => {
-        const pageToFetch = fetcher.data ? fetcher.data.page + 1 : page + 1
-        const query = `?index&page=${pageToFetch}`
-        fetcher.load(query)
-      }}
+          const pageToFetch = fetcher.data ? fetcher.data.page + 1 : page + 1
+          const query = `?index&page=${pageToFetch}`
+          fetcher.load(query)
+        }}
         loading={fetcher.state === 'loading'}
-    >
+      >
         <MovieCardWrapper>
           {renderMovies.map((m) => (
             <MovieCard key={m.id}>
               <img
                 src={`https://image.tmdb.org/t/p/w500/${m.poster_path}`}
                 alt="img mov"
-            />
+              />
               <MovieWriteup>
                 <h4>{m.title}</h4>
                 <p>
@@ -46,12 +46,13 @@ export default function MovieList() {
                 </p>
                 <p>Rating: {m.vote_average}</p>
                 <CardBottom>
-                  <WatchButton>watch trailer</WatchButton>
+                  <WatchButton>
+                  </WatchButton>
                   <WishListButton>wishlist</WishListButton>
                 </CardBottom>
               </MovieWriteup>
             </MovieCard>
-        ))}
+          ))}
         </MovieCardWrapper>
       </MoviesInfiniteScroll>
       {fetcher.state === 'loading' && <>loading</>}
@@ -60,7 +61,8 @@ export default function MovieList() {
 }
 
 const MoviesContainer = styled.div`
-color: white;`
+  color: white;
+`
 const CardBottom = styled.div`
   display: flex;
   gap: 5px;
@@ -99,6 +101,7 @@ const MovieWriteup = styled.div`
   font-family: 'Nunito Sans', 'Nunito Sans Regular', 'Lucida  Grande',
     'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   font-weight: semi-bold;
+  font-size: 14px;
   box-sizing: border-box;
   clip-path: circle(10% at 100% 100%);
   display: flex;
@@ -107,7 +110,6 @@ const MovieWriteup = styled.div`
 
   & p {
     color: #e3e5e8b8;
-    font-size: 12px;
     padding-block-start: 10px;
     font-weight: lighter;
     flex: 1 1 100%;

@@ -1,6 +1,7 @@
 /* react-carousel styles */
 .react-multi-carousel-list {
   height: 100%;
+  /* border: 1px solid red; */
 }
 
 body {

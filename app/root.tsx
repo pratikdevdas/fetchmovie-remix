@@ -10,6 +10,7 @@ import {
 } from '@remix-run/react'
 import { createHead } from 'remix-island'
 import misc from './styles/misc.css'
+import styles from './styles/styles.css'
 
 export const links: LinksFunction = () => {
   return [
@@ -35,7 +36,7 @@ export const links: LinksFunction = () => {
           {
             rel: 'stylesheet',
             href: misc
-          }
+          },
         ]
       : [])
   ]

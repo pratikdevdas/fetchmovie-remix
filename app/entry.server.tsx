@@ -4,7 +4,6 @@ import { Response } from '@remix-run/node'
 import { RemixServer } from '@remix-run/react'
 import { renderToString } from 'react-dom/server'
 import { Head } from './root'
-import misc from './styles/misc.css'
 
 // hydration issue as extensions inject script in the code react will start over with client side
 // temporary fix: https://github.com/remix-run/remix/discussions/5244#discussioncomment-4850658
@@ -32,7 +31,7 @@ export default function handleRequest(
     `<!DOCTYPE html>
       <html>
         <head>
-          <link rel="stylesheet" href="${misc}">
+          <link rel="stylesheet">
           ${styledComponentsStyles}
           <!--start head-->
           ${head}
