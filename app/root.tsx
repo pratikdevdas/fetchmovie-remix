@@ -41,16 +41,13 @@ export const links: LinksFunction = () => {
   ]
 }
 
-
 export const Head = createHead(() => (
   <>
     <Meta />
     <Links />
-    {typeof document === 'undefined'
-          ? '__STYLES__'
-          : null}
+    {typeof document === 'undefined' ? '__STYLES__' : null}
   </>
-  ))
+))
 
 export default function App() {
   return (

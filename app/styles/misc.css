@@ -3,6 +3,7 @@
   height: 100%;
 }
 
-body{
-  background: #0C0E13;
+body {
+  background: #0c0e13;
+  overflow-x: hidden;
 }

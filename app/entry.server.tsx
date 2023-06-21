@@ -6,10 +6,10 @@ import { renderToString } from 'react-dom/server'
 import { Head } from './root'
 import misc from './styles/misc.css'
 
-  // hydration issue as extensions inject script in the code react will start over with client side
-  // temporary fix: https://github.com/remix-run/remix/discussions/5244#discussioncomment-4850658
-  // with help of: https://github.com/kiliman/remix-hydration-fix
-  // update code later if react 18.3 fixes this
+// hydration issue as extensions inject script in the code react will start over with client side
+// temporary fix: https://github.com/remix-run/remix/discussions/5244#discussioncomment-4850658
+// with help of: https://github.com/kiliman/remix-hydration-fix
+// update code later if react 18.3 fixes this
 
 export default function handleRequest(
   request: Request,
@@ -44,7 +44,7 @@ export default function handleRequest(
       </html>`,
     {
       status: responseStatusCode,
-      headers: responseHeaders,
+      headers: responseHeaders
     }
   )
 }
@@ -58,9 +58,9 @@ function renderHead(request: Request, remixContext: EntryContext) {
           ...remixContext.routeModules,
           root: {
             ...remixContext.routeModules.root,
-            default: Head,
-          },
-        },
+            default: Head
+          }
+        }
       }}
       url={request.url}
     />
