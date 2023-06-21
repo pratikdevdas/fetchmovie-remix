@@ -18,42 +18,49 @@ export default function MovieList() {
       setRenderMovies((prevAssets) => [...prevAssets, ...newItems])
     }
   }, [fetcher.data])
+  console.log(fetcher.state)
 
   return (
-    <MoviesInfiniteScroll
-      loadNext={() => {
+    <MoviesContainer>
+
+      <MoviesInfiniteScroll
+        loadNext={() => {
         const pageToFetch = fetcher.data ? fetcher.data.page + 1 : page + 1
         const query = `?index&page=${pageToFetch}`
         fetcher.load(query)
       }}
-      loading={fetcher.state === 'loading'}
+        loading={fetcher.state === 'loading'}
     >
-      <MovieCardWrapper>
-        {renderMovies.map((m) => (
-          <MovieCard key={m.id}>
-            <img
-              src={`https://image.tmdb.org/t/p/w500/${m.poster_path}`}
-              alt="img mov"
+        <MovieCardWrapper>
+          {renderMovies.map((m) => (
+            <MovieCard key={m.id}>
+              <img
+                src={`https://image.tmdb.org/t/p/w500/${m.poster_path}`}
+                alt="img mov"
             />
-            <MovieWriteup>
-              <h4>{m.title}</h4>
-              <p>
-                {m.overview.substring(0, 170)}
-                <span> ...readmore </span>
-              </p>
-              <p>Rating: {m.vote_average}</p>
-              <CardBottom>
-                <WatchButton>watch trailer</WatchButton>
-                <WishListButton>wishlist</WishListButton>
-              </CardBottom>
-            </MovieWriteup>
-          </MovieCard>
+              <MovieWriteup>
+                <h4>{m.title}</h4>
+                <p>
+                  {m.overview.substring(0, 170)}
+                  <span> ...readmore </span>
+                </p>
+                <p>Rating: {m.vote_average}</p>
+                <CardBottom>
+                  <WatchButton>watch trailer</WatchButton>
+                  <WishListButton>wishlist</WishListButton>
+                </CardBottom>
+              </MovieWriteup>
+            </MovieCard>
         ))}
-      </MovieCardWrapper>
-    </MoviesInfiniteScroll>
+        </MovieCardWrapper>
+      </MoviesInfiniteScroll>
+      {fetcher.state === 'loading' && <>loading</>}
+    </MoviesContainer>
   )
 }
 
+const MoviesContainer = styled.div`
+color: white;`
 const CardBottom = styled.div`
   display: flex;
   gap: 5px;
