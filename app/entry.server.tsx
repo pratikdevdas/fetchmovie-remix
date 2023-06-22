@@ -8,7 +8,10 @@ import { Head } from './root'
 // hydration issue as extensions inject script in the code react will start over with client side
 // temporary fix: https://github.com/remix-run/remix/discussions/5244#discussioncomment-4850658
 // with help of: https://github.com/kiliman/remix-hydration-fix
-// update code later if react 18.3 fixes this
+// update code later if react 18.3 fixes this because this code will not hydrate the entire document and will create issues like
+// no prefetching of data before the page loads as my scripts are in body and not head for now added a settime out before page loads
+// css laoded initially in head will only work
+//revert entry.client.tsx entry.server.tsx  root.tsx
 
 export default function handleRequest(
   request: Request,

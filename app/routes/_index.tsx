@@ -3,11 +3,21 @@ import { type V2_MetaFunction } from '@remix-run/node'
 import { styled } from 'styled-components'
 import Navbar from '~/components/Navbar/Navbar'
 import MovieList from '~/components/MovieHome/MovieList'
+import styles from '../styles/styles.css'
 
 export const meta: V2_MetaFunction = () => {
   return [
     { title: 'The Movie App' },
     { name: 'description', content: 'Welcome to Remix!' }
+  ]
+}
+
+export const links = () => {
+  return [
+    {
+      rel: 'stylesheet',
+      href: styles
+    }
   ]
 }
 
@@ -48,12 +58,12 @@ const getMovieGenreList = async () => {
   }
 }
 
-const getMovieList = async (page: number) => {
+const getMovieList = async (page: number, genre?: number) => {
   try {
-    const response = await fetch(
-      `https://api.themoviedb.org/3/discover/movie?language=en-US&page=${page}`,
-      options
-    )
+    const url = genre
+      ? `https://api.themoviedb.org/3/discover/movie?language=en-US&page=${page}&with_genres=${genre}`
+      : `https://api.themoviedb.org/3/discover/movie?language=en-US&page=${page}`
+    const response = await fetch(url, options)
     const movies = await response.json()
     return movies
   } catch (error) {
@@ -63,10 +73,9 @@ const getMovieList = async (page: number) => {
 export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url)
   const page = url.searchParams.get('page') || 1
-
+  const genre = url.searchParams.get('with_genres')
   const genres: Genres[] = await getMovieGenreList()
-  const movies: Movies = await getMovieList(Number(page))
-  console.log('^&(&(*&(*&')
+  const movies: Movies = await getMovieList(Number(page), Number(genre))
   return { genres, movies: movies.results, page: Number(page) }
 }
 

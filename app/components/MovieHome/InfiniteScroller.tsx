@@ -11,6 +11,7 @@ const InfiniteScroll = (props: {
   useEffect(() => {
     scrollRef.current = loadNext
   }, [loadNext])
+
   const onScroll = () => {
     const scroll = Math.floor(window.innerHeight + window.scrollY)
     const documentHeight = document.documentElement.scrollHeight

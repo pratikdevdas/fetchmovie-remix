@@ -1,14 +1,16 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import styles from '../../styles/styles.css'
+
 export const links = () => {
   return [
     {
       rel: 'stylesheet',
       href: styles
-    },
+    }
   ]
 }
+
 export default function Movie() {
   return (
     <Dialog.Root>
@@ -34,7 +36,13 @@ export default function Movie() {
             </label>
             <input className="Input" id="username" defaultValue="@peduarte" />
           </fieldset>
-          <div style={{ display: 'flex', marginTop: 25, justifyContent: 'flex-end' }}>
+          <div
+            style={{
+              display: 'flex',
+              marginTop: 25,
+              justifyContent: 'flex-end'
+            }}
+          >
             <Dialog.Close asChild>
               <button className="Button green">Save changes</button>
             </Dialog.Close>

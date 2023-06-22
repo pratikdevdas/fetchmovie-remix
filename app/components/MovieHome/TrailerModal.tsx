@@ -2,12 +2,10 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
 
 const TrailerModal = () => {
-  console.log('object')
-
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button className="Button violet">Edit profile</button>
+        <button className="Button violet">Open modal</button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay" />

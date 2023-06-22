@@ -1,32 +1,46 @@
-import { useFetcher, useLoaderData } from '@remix-run/react'
-import { useEffect, useState } from 'react'
+import { useFetcher, useLoaderData, useSearchParams } from '@remix-run/react'
+import { useEffect, useRef, useState } from 'react'
 import type { Movie, loader } from '~/routes/_index'
 import styled from 'styled-components'
 import MoviesInfiniteScroll from './InfiniteScroller'
+import TrailerModal from './TrailerModal'
 
 export default function MovieList() {
   const { movies, page } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
+  const [search] = useSearchParams()
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
+  const genreId = search.get('with_genres')
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
       return
     }
-
     if (fetcher.data) {
       const newItems = fetcher.data.movies
       setRenderMovies((prevAssets) => [...prevAssets, ...newItems])
     }
   }, [fetcher.data])
-  console.log(fetcher.state)
+
+  useEffect(() => {
+    if (fetcher.data) {
+      setRenderMovies([])
+      fetcher.load(`?index&with_genres=${genreId}`)
+    } else {
+      setRenderMovies(movies)
+    }
+  }, [genreId])
+
+  console.log(fetcher)
 
   return (
     <MoviesContainer>
       <MoviesInfiniteScroll
         loadNext={() => {
           const pageToFetch = fetcher.data ? fetcher.data.page + 1 : page + 1
-          const query = `?index&page=${pageToFetch}`
+          const query = genreId
+            ? `?index&with_genres=${genreId}&page=${pageToFetch}`
+            : `?index&page=${pageToFetch}`
           fetcher.load(query)
         }}
         loading={fetcher.state === 'loading'}
@@ -47,6 +61,7 @@ export default function MovieList() {
                 <p>Rating: {m.vote_average}</p>
                 <CardBottom>
                   <WatchButton>
+                    <TrailerModal />
                   </WatchButton>
                   <WishListButton>wishlist</WishListButton>
                 </CardBottom>
