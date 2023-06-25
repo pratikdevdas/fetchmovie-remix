@@ -1,31 +1,56 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
+import WatchTrailer from '../Button/WatchTrailer'
+import {
+  useFetcher,
+  useLoaderData,
+  useNavigation,
+  useSearchParams
+} from '@remix-run/react'
+import { useEffect, useState } from 'react'
 
-const TrailerModal = () => {
+const TrailerModal = ({ movieId }: { movieId: number }) => {
+  const [search] = useSearchParams()
+  const fetcher = useFetcher()
+  const { movieTrailerId } = useLoaderData()
+  const [final, setFinal] = useState()
+  const navigate = useNavigation()
+  console.log(navigate.state)
+  useEffect(() => {
+    if (!fetcher.data) {
+      fetcher.load(`?&movieId=${movieId}`)
+      setFinal(fetcher.data)
+    }
+  }, [search])
+
+  // console.log(final)
+  // console.log(fetcher.data?.movieTrailerId)
+  // const [trailer, setTrailer] = useState(null)
+
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button className="Button violet">Open modal</button>
+        <WatchTrailer />
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay" />
         <Dialog.Content className="DialogContent">
           <Dialog.Title className="DialogTitle">Edit profile</Dialog.Title>
-          <Dialog.Description className="DialogDescription">
-            Make changes to your profile here. Click save when done.
-          </Dialog.Description>
-          <fieldset className="Fieldset">
-            <label className="Label" htmlFor="name">
-              Name
-            </label>
-            <input className="Input" id="name" defaultValue="Pedro Duarte" />
-          </fieldset>
-          <fieldset className="Fieldset">
-            <label className="Label" htmlFor="username">
-              Username
-            </label>
-            <input className="Input" id="username" defaultValue="@peduarte" />
-          </fieldset>
+          {movieId}
+          {navigate.state === 'loading' ? (
+            <></>
+          ) : (
+            <>
+              <iframe
+                src={`https://www.youtube.com/embed/${movieTrailerId}`}
+                frameBorder="0"
+                allow="autoplay; encrypted-media"
+                title="video"
+              />
+
+              {movieTrailerId}
+            </>
+          )}
           <div
             style={{
               display: 'flex',

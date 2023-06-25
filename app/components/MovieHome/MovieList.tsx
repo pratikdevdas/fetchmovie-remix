@@ -1,17 +1,25 @@
-import { useFetcher, useLoaderData, useSearchParams } from '@remix-run/react'
-import { useEffect, useRef, useState } from 'react'
+import {
+  NavLink,
+  useFetcher,
+  useLoaderData,
+  useSearchParams
+} from '@remix-run/react'
+import { useEffect, useState } from 'react'
 import type { Movie, loader } from '~/routes/_index'
 import styled from 'styled-components'
 import MoviesInfiniteScroll from './InfiniteScroller'
 import TrailerModal from './TrailerModal'
+import { HeartIcon } from '@radix-ui/react-icons'
 
 export default function MovieList() {
-  const { movies, page } = useLoaderData<typeof loader>()
+  const { movies, page, movieTrailerId } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
   const genreId = search.get('with_genres')
+  // console.log(movieTrailerId)
 
+  console.log(fetcher)
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
       return
@@ -30,8 +38,6 @@ export default function MovieList() {
       setRenderMovies(movies)
     }
   }, [genreId])
-
-  console.log(fetcher)
 
   return (
     <MoviesContainer>
@@ -60,10 +66,19 @@ export default function MovieList() {
                 </p>
                 <p>Rating: {m.vote_average}</p>
                 <CardBottom>
-                  <WatchButton>
-                    <TrailerModal />
+                  <WatchButton
+                    onClick={() => {
+                      console.log('happen')
+                      fetcher.load(`?with_genres=${genreId}&movieId=${m.id}`)
+                    }}
+                  >
+                    <NavLink to={`?with_genres=${genreId}&movieId=${m.id}`}>
+                      <TrailerModal movieId={m.id} />
+                    </NavLink>
                   </WatchButton>
-                  <WishListButton>wishlist</WishListButton>
+                  <WishListButton>
+                    <Heart height={20} width={20} />
+                  </WishListButton>
                 </CardBottom>
               </MovieWriteup>
             </MovieCard>
@@ -75,15 +90,23 @@ export default function MovieList() {
   )
 }
 
+const Heart = styled(HeartIcon)`
+  font-size: 70px;
+`
 const MoviesContainer = styled.div`
   color: white;
 `
 const CardBottom = styled.div`
   display: flex;
   gap: 5px;
+  align-items: center;
+  justify-content: space-between;
+`
+const WishListButton = styled.div`
+  display: flex;
+  align-items: center;
 `
 const WatchButton = styled.button``
-const WishListButton = styled.button``
 const MovieCardWrapper = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -122,6 +145,10 @@ const MovieWriteup = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+
+  & h4 {
+    font-size: 16px;
+  }
 
   & p {
     color: #e3e5e8b8;

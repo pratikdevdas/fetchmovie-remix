@@ -2,15 +2,11 @@ import { styled } from 'styled-components'
 import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
 import type { loader } from '~/routes/_index'
-import { useRevalidator, useFetcher, useLoaderData } from '@remix-run/react'
+import { useLoaderData } from '@remix-run/react'
 import { NavLink } from '@remix-run/react'
 
 const TabCarousel = () => {
   const { genres } = useLoaderData<typeof loader>()
-  const fetcher = useFetcher<typeof loader>()
-  const revalidator = useRevalidator()
-
-  console.log(revalidator)
   const responsive = {
     desktop: {
       breakpoint: { max: 3000, min: 720 },
@@ -45,8 +41,8 @@ const TabCarousel = () => {
         >
           {genres.map((g) => (
             <Category key={g.id}>
-              <NavLink to={`?with_genres=${g.id}`}>
-                <span onClick={() => revalidator.revalidate()}>{g.name}</span>
+              <NavLink prefetch="intent" to={`?with_genres=${g.id}`}>
+                {g.name}
               </NavLink>
             </Category>
           ))}

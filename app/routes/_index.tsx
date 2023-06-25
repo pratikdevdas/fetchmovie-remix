@@ -70,12 +70,42 @@ const getMovieList = async (page: number, genre?: number) => {
     console.log(error)
   }
 }
+
+const getTrailer = async (trailer: number) => {
+  try {
+    console.log(trailer, 'das')
+    const url = `https://api.themoviedb.org/3/movie/${trailer}/videos`
+    const response = await fetch(url, options)
+    const movieTrailer = await response.json()
+    const findTrailer = movieTrailer.results.find(
+      (t) => t.type === 'Trailer' && t.official === true
+    )
+    console.log(findTrailer, 'fje')
+    // console.log(movieTrailer,'')
+    return findTrailer ? findTrailer.key : []
+  } catch (error) {
+    console.log(error)
+  }
+}
 export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url)
+  console.log(url, 'url')
   const page = url.searchParams.get('page') || 1
   const genre = url.searchParams.get('with_genres')
+  const movieId = url.searchParams.get('movieId')
+  console.log(movieId, 'movieId')
   const genres: Genres[] = await getMovieGenreList()
   const movies: Movies = await getMovieList(Number(page), Number(genre))
+  if (movieId) {
+    const movieTrailerId = await getTrailer(Number(movieId))
+    console.log(movieTrailerId)
+    return {
+      genres,
+      movies: movies.results,
+      page: Number(page),
+      movieTrailerId
+    }
+  }
   return { genres, movies: movies.results, page: Number(page) }
 }
 
@@ -84,8 +114,6 @@ export default function Index() {
     <Home>
       <Navbar />
       <MovieList />
-
-      {/* put a loader based on fetch state */}
     </Home>
   )
 }

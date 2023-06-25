@@ -17,7 +17,9 @@ const InfiniteScroll = (props: {
     const documentHeight = document.documentElement.scrollHeight
     // adding a scroll buffer of -1 px
     const scrollEnds =
-      scroll === documentHeight || scroll === documentHeight - 1
+      scroll === documentHeight ||
+      scroll === documentHeight - 1 ||
+      Math.floor(scroll / 2) === Math.floor(documentHeight / 2)
 
     if (scrollEnds && !loading) {
       scrollRef.current()
