@@ -37,7 +37,10 @@ export interface Movies {
   page: number
   results: Movie[]
 }
-
+interface TrailerFetch{
+  type: string
+  official: boolean
+}
 const genreUrl = 'https://api.themoviedb.org/3/genre/movie/list?language=en'
 
 const options = {
@@ -78,7 +81,7 @@ const getTrailer = async (trailer: number) => {
     const response = await fetch(url, options)
     const movieTrailer = await response.json()
     const findTrailer = movieTrailer.results.find(
-      (t) => t.type === 'Trailer' && t.official === true
+      (t:TrailerFetch) => t.type === 'Trailer' && t.official === true
     )
     console.log(findTrailer, 'fje')
     // console.log(movieTrailer,'')

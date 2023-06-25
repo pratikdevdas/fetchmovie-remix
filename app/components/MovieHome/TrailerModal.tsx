@@ -2,30 +2,13 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import WatchTrailer from '../Button/WatchTrailer'
 import {
-  useFetcher,
   useLoaderData,
   useNavigation,
-  useSearchParams
 } from '@remix-run/react'
-import { useEffect, useState } from 'react'
 
 const TrailerModal = ({ movieId }: { movieId: number }) => {
-  const [search] = useSearchParams()
-  const fetcher = useFetcher()
   const { movieTrailerId } = useLoaderData()
-  const [final, setFinal] = useState()
   const navigate = useNavigation()
-  console.log(navigate.state)
-  useEffect(() => {
-    if (!fetcher.data) {
-      fetcher.load(`?&movieId=${movieId}`)
-      setFinal(fetcher.data)
-    }
-  }, [search])
-
-  // console.log(final)
-  // console.log(fetcher.data?.movieTrailerId)
-  // const [trailer, setTrailer] = useState(null)
 
   return (
     <Dialog.Root>

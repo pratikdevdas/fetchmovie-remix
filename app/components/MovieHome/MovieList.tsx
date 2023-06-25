@@ -12,7 +12,7 @@ import TrailerModal from './TrailerModal'
 import { HeartIcon } from '@radix-ui/react-icons'
 
 export default function MovieList() {
-  const { movies, page, movieTrailerId } = useLoaderData<typeof loader>()
+  const { movies, page } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
@@ -73,7 +73,7 @@ export default function MovieList() {
                     }}
                   >
                     <NavLink to={`?with_genres=${genreId}&movieId=${m.id}`}>
-                      <TrailerModal movieId={m.id} />
+                      <TrailerModal movieId={Number(m.id)} />
                     </NavLink>
                   </WatchButton>
                   <WishListButton>
