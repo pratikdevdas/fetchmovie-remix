@@ -64,8 +64,8 @@ const getMovieGenreList = async () => {
 const getMovieList = async (page: number, genre?: number) => {
   try {
     const url = genre
-      ? `https://api.themoviedb.org/3/discover/movie?language=en-US&page=${page}&with_genres=${genre}`
-      : `https://api.themoviedb.org/3/discover/movie?language=en-US&page=${page}`
+      ? `https://api.themoviedb.org/3/discover/movie?&certification_country=US&certification.lte=PG-13&language=en-US&page=${page}&with_genres=${genre}`
+      : `https://api.themoviedb.org/3/discover/movie?&certification_country=US&certification.lte=PG-13&language=en-US&page=${page}`
     const response = await fetch(url, options)
     const movies = await response.json()
     return movies
