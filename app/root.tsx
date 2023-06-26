@@ -54,7 +54,8 @@ export default function App() {
     <>
       <Head />
       <Outlet />
-      <ScrollRestoration />
+      {/* removed because scroll was going up on loading modal */}
+      {/* <ScrollRestoration /> */}
       <Scripts />
       <LiveReload />
     </>

@@ -4,8 +4,8 @@ const InfiniteScroll = (props: {
   loading: boolean
   loadNext: () => void
 }) => {
-  const { children, loading, loadNext } = props
 
+  const { children, loading, loadNext } = props
   const scrollRef = useRef(loadNext)
 
   useEffect(() => {
@@ -34,6 +34,7 @@ const InfiniteScroll = (props: {
       window.removeEventListener('scroll', onScroll)
     }
   })
+
   return <div>{children}</div>
 }
 

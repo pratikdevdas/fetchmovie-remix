@@ -1,5 +1,5 @@
 import {
-  NavLink,
+  Link,
   useFetcher,
   useLoaderData,
   useSearchParams
@@ -17,9 +17,7 @@ export default function MovieList() {
   const [search] = useSearchParams()
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
   const genreId = search.get('with_genres')
-  // console.log(movieTrailerId)
 
-  console.log(fetcher)
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
       return
@@ -66,15 +64,10 @@ export default function MovieList() {
                 </p>
                 <p>Rating: {m.vote_average}</p>
                 <CardBottom>
-                  <WatchButton
-                    onClick={() => {
-                      console.log('happen')
-                      fetcher.load(`?with_genres=${genreId}&movieId=${m.id}`)
-                    }}
-                  >
-                    <NavLink to={`?with_genres=${genreId}&movieId=${m.id}`}>
+                  <WatchButton>
+                    <Link to={`?index&with_genres=${genreId}&movieId=${m.id}`}>
                       <TrailerModal movieId={Number(m.id)} />
-                    </NavLink>
+                    </Link>
                   </WatchButton>
                   <WishListButton>
                     <Heart height={20} width={20} />
