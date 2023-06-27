@@ -1,34 +1,13 @@
-import styled from 'styled-components'
-import PopoverWrapper from './Popover'
 import TabCarousel from './TabCarousel'
-
+import TopNavbar from './TopNavbar'
+import { NavWrapper, NavContainer } from '~/styles/styles'
 export default function Navbar() {
   return (
     <NavContainer>
-      <NavWrapper>
-        <LogoHeader>The Movie App</LogoHeader>
-        <LogoHeader>sf</LogoHeader>
-        <PopoverWrapper />
-      </NavWrapper>
+      <TopNavbar />
       <NavWrapper>
         <TabCarousel></TabCarousel>
       </NavWrapper>
     </NavContainer>
   )
 }
-
-const NavContainer = styled.div`
-  width: 100%;
-`
-
-const NavWrapper = styled.div`
-  height: 72px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  color: white;
-`
-
-const LogoHeader = styled.h1`
-  font-family: 'Nunito Sans', sans-serif;
-`

@@ -1,10 +1,9 @@
 import type { LoaderArgs } from '@remix-run/node'
 import { type V2_MetaFunction } from '@remix-run/node'
-import { styled } from 'styled-components'
 import Navbar from '~/components/Navbar/Navbar'
 import MovieList from '~/components/MovieHome/MovieList'
 import styles from '../styles/styles.css'
-
+import { HomeContainer } from '~/styles/styles'
 export const meta: V2_MetaFunction = () => {
   return [
     { title: 'The Movie App' },
@@ -37,7 +36,7 @@ export interface Movies {
   page: number
   results: Movie[]
 }
-interface TrailerFetch{
+interface TrailerFetch {
   type: string
   official: boolean
 }
@@ -81,7 +80,7 @@ const getTrailer = async (trailer: number) => {
     const response = await fetch(url, options)
     const movieTrailer = await response.json()
     const findTrailer = movieTrailer.results.find(
-      (t:TrailerFetch) => t.type === 'Trailer' && t.official === true
+      (t: TrailerFetch) => t.type === 'Trailer' && t.official === true
     )
     console.log(findTrailer, 'fje')
     // console.log(movieTrailer,'')
@@ -114,14 +113,9 @@ export async function loader({ request }: LoaderArgs) {
 
 export default function Index() {
   return (
-    <Home>
+    <HomeContainer>
       <Navbar />
       <MovieList />
-    </Home>
+    </HomeContainer>
   )
 }
-
-const Home = styled.div`
-  max-width: 1280px;
-  margin: 0 auto;
-`

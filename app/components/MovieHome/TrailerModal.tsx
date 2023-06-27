@@ -1,10 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import WatchTrailer from '../Button/WatchTrailer'
-import {
-  useLoaderData,
-  useNavigation,
-} from '@remix-run/react'
+import { useLoaderData, useNavigation } from '@remix-run/react'
 
 const TrailerModal = ({ movieId }: { movieId: number }) => {
   const { movieTrailerId } = useLoaderData()

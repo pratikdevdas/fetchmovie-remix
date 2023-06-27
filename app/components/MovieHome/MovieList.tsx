@@ -57,7 +57,9 @@ export default function MovieList() {
                 alt="img mov"
               />
               <MovieWriteup>
-                <h4>{m.title}</h4>
+                <h4>
+                  <Link to={`movies/${m.id}`}>{m.title}</Link>
+                </h4>
                 <p>
                   {m.overview.substring(0, 170)}
                   <span> ...readmore </span>
