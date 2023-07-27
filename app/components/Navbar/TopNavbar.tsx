@@ -2,6 +2,7 @@ import { Link } from '@remix-run/react'
 import PopoverWrapper from './Popover'
 import styled from 'styled-components'
 import { NavWrapper } from '~/styles/styles'
+import SearchBar from './SearchBar'
 
 export default function TopNavbar() {
   return (
@@ -9,7 +10,7 @@ export default function TopNavbar() {
       <LogoHeader>
         <Link to="/">The Movie App</Link>
       </LogoHeader>
-      <LogoHeader>sf</LogoHeader>
+      <SearchBar />
       <PopoverWrapper />
     </NavWrapper>
   )

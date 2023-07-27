@@ -9,17 +9,13 @@ import {
   ScrollRestoration
 } from '@remix-run/react'
 import { createHead } from 'remix-island'
-import misc from './styles/misc.css'
+import main from './styles/main.css'
 
 export const links: LinksFunction = () => {
   return [
     ...(cssBundleHref
       ? [
           { rel: 'stylesheet', href: cssBundleHref },
-          {
-            rel: 'stylesheet',
-            href: 'https://unpkg.com/modern-css-reset@1.4.0/dist/reset.min.css'
-          },
           {
             rel: 'preconnect',
             href: 'https://fonts.googleapis.com'
@@ -34,7 +30,11 @@ export const links: LinksFunction = () => {
           },
           {
             rel: 'stylesheet',
-            href: misc
+            href: 'https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap'
+          },
+          {
+            rel: 'stylesheet',
+            href: main
           }
         ]
       : [])

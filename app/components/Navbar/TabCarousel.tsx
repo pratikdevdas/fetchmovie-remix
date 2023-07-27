@@ -60,12 +60,26 @@ const TabWrapper = styled.div`
   display: flex;
   width: 100%;
   height: 100%;
+  font-size: 14px;
+  line-height: 20px; /* 200% */
+  font-style: normal;
+  font-weight: 500;
 `
 const CategoryWrapper = styled.div`
   height: 100%;
   width: 90%;
+
+
 `
 const FilterButton = styled.button`
   width: 10%;
+  background-color: transparent;
+  cursor: pointer;
+  border-radius: 30px;
+  background: var(--gray-white, #fff);
+  color: var(--gray-black, #010101);
+  text-align: center;
+  padding: 7px 0;
+  font: inherit;
 `
 const Category = styled.div``

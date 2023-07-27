@@ -131,8 +131,6 @@ const MovieWriteup = styled.div`
   height: 100%;
   transition: all 0.7s ease-in-out;
   padding: 20px;
-  font-family: 'Nunito Sans', 'Nunito Sans Regular', 'Lucida  Grande',
-    'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   font-weight: semi-bold;
   font-size: 14px;
   box-sizing: border-box;
@@ -142,7 +140,14 @@ const MovieWriteup = styled.div`
   justify-content: space-between;
 
   & h4 {
-    font-size: 16px;
+    font-size: 18px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-weight: 700;
+    line-height: 28px;
+    & a {
+      color: white;
+      text-decoration: none;
+    }
   }
 
   & p {
