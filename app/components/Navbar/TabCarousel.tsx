@@ -68,8 +68,6 @@ const TabWrapper = styled.div`
 const CategoryWrapper = styled.div`
   height: 100%;
   width: 90%;
-
-
 `
 const FilterButton = styled.button`
   width: 10%;

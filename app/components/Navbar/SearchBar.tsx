@@ -20,9 +20,14 @@ const InputBar = styled.input`
   padding: 16px;
   box-sizing: border-box;
   border-radius: 15px;
-  letter-spacing: .50px;
+  letter-spacing: 0.5px;
   background: var(--gray-dark-2, #0e0e0e);
   backdrop-filter: blur(21.5px);
+  color: #fff;
+  border: none;
+  &:focus-visible {
+    outline: 1px solid #fff;
+  }
 `
 
 const Image = styled.img`

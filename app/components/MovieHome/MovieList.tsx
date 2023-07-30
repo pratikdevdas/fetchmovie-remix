@@ -16,6 +16,7 @@ export default function MovieList() {
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
+  const [wishlist, setWishlist] = useState<number[]>([])
   const genreId = search.get('with_genres')
 
   useEffect(() => {
@@ -37,6 +38,15 @@ export default function MovieList() {
     }
   }, [genreId])
 
+  const handleWishlist = (movieId: number) => {
+    if (wishlist.includes(movieId)) {
+      setWishlist(wishlist.filter((f) => f !== movieId))
+    } else {
+      setWishlist([...wishlist, movieId])
+    }
+  }
+
+  console.log(wishlist)
   return (
     <MoviesContainer>
       <MoviesInfiniteScroll
@@ -55,6 +65,7 @@ export default function MovieList() {
               <img
                 src={`https://image.tmdb.org/t/p/w500/${m.poster_path}`}
                 alt="img mov"
+                loading="lazy"
               />
               <MovieWriteup>
                 <h4>
@@ -68,25 +79,42 @@ export default function MovieList() {
                 <CardBottom>
                   <WatchButton>
                     <Link to={`?index&with_genres=${genreId}&movieId=${m.id}`}>
-                      <TrailerModal movieId={Number(m.id)} />
+                      <TrailerModal
+                        movieId={Number(m.id)}
+                        genreId={Number(genreId)}
+                      />
                     </Link>
                   </WatchButton>
                   <WishListButton>
-                    <Heart height={20} width={20} />
+                    {wishlist.includes(Number(m.id)) ? (
+                      <Heart
+                        fill="wishlisted"
+                        height={20}
+                        width={20}
+                        onClick={() => handleWishlist(Number(m.id))}
+                      />
+                    ) : (
+                      <Heart
+                        height={20}
+                        width={20}
+                        onClick={() => handleWishlist(Number(m.id))}
+                      />
+                    )}
                   </WishListButton>
                 </CardBottom>
               </MovieWriteup>
             </MovieCard>
           ))}
+          {fetcher.state === 'loading' && <> </>}
         </MovieCardWrapper>
       </MoviesInfiniteScroll>
-      {fetcher.state === 'loading' && <>loading</>}
     </MoviesContainer>
   )
 }
 
-const Heart = styled(HeartIcon)`
-  font-size: 70px;
+const Heart = styled(HeartIcon)<{ fill?: string }>`
+  font-size: 48px;
+  background-color: ${(props) => (props.fill ? 'red' : '')};
 `
 const MoviesContainer = styled.div`
   color: white;
@@ -159,18 +187,6 @@ const MovieWriteup = styled.div`
 `
 
 const MovieCard = styled.div`
-  background-image: linear-gradient(
-      0deg,
-      rgba(21, 24, 30, 0.88),
-      rgba(21, 24, 30, 0.88)
-    ),
-    linear-gradient(
-      240.05deg,
-      rgb(34, 38, 47) 2.21%,
-      rgba(34, 38, 47, 0) 43.89%,
-      rgb(34, 38, 47) 115.91%
-    );
-  box-shadow: rgba(0, 0, 0, 0.05) 0px 0.25em 4em;
   cursor: pointer;
   transition: all 0.5s cubic-bezier(0.8, 0.5, 0.2, 1.4);
   overflow: hidden;
@@ -183,7 +199,7 @@ const MovieCard = styled.div`
   }
 
   &:hover {
-    transition: all 0.5s cubic-bezier(0.8, 0.5, 0.2, 1.4);
+    /* transition: all 0.5s cubic-bezier(0.8, 0.5, 0.2, 1.4); */
     box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.3);
     transform: scale(1.05);
     border: 2px solid #15191f;

@@ -75,15 +75,12 @@ const getMovieList = async (page: number, genre?: number) => {
 
 const getTrailer = async (trailer: number) => {
   try {
-    console.log(trailer, 'das')
     const url = `https://api.themoviedb.org/3/movie/${trailer}/videos`
     const response = await fetch(url, options)
     const movieTrailer = await response.json()
     const findTrailer = movieTrailer.results.find(
       (t: TrailerFetch) => t.type === 'Trailer' && t.official === true
     )
-    console.log(findTrailer, 'fje')
-    // console.log(movieTrailer,'')
     return findTrailer ? findTrailer.key : []
   } catch (error) {
     console.log(error)

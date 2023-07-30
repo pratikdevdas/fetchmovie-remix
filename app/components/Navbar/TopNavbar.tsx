@@ -11,7 +11,10 @@ export default function TopNavbar() {
         <Link to="/">The Movie App</Link>
       </LogoHeader>
       <SearchBar />
-      <PopoverWrapper />
+      <div>
+        <Link to="/wishlist">Wishlist</Link>
+        <PopoverWrapper />
+      </div>
     </NavWrapper>
   )
 }

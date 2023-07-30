@@ -1,9 +1,16 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import WatchTrailer from '../Button/WatchTrailer'
-import { useLoaderData, useNavigation } from '@remix-run/react'
+import { Link, useLoaderData, useNavigation } from '@remix-run/react'
+import styled from 'styled-components'
 
-const TrailerModal = ({ movieId }: { movieId: number }) => {
+const TrailerModal = ({
+  movieId,
+  genreId
+}: {
+  movieId: number
+  genreId: number
+}) => {
   const { movieTrailerId } = useLoaderData()
   const navigate = useNavigation()
 
@@ -14,22 +21,17 @@ const TrailerModal = ({ movieId }: { movieId: number }) => {
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay" />
-        <Dialog.Content className="DialogContent">
+        <ModalContainer className="DialogContent">
           <Dialog.Title className="DialogTitle">Edit profile</Dialog.Title>
           {movieId}
           {navigate.state === 'loading' ? (
-            <></>
+            <IFrameContainer />
           ) : (
-            <>
-              <iframe
-                src={`https://www.youtube.com/embed/${movieTrailerId}`}
-                frameBorder="0"
-                allow="autoplay; encrypted-media"
-                title="video"
-              />
-
-              {movieTrailerId}
-            </>
+            <IFrameContainer
+              src={`https://www.youtube.com/embed/${movieTrailerId}?autoplay=1`}
+              allow="autoplay; encrypted-media"
+              title="video"
+            ></IFrameContainer>
           )}
           <div
             style={{
@@ -43,14 +45,25 @@ const TrailerModal = ({ movieId }: { movieId: number }) => {
             </Dialog.Close>
           </div>
           <Dialog.Close asChild>
-            <button className="IconButton" aria-label="Close">
-              <Cross2Icon />
-            </button>
+            <Link to={`?index&with_genres=${genreId}`}>
+              <button className="IconButton" aria-label="Close">
+                <Cross2Icon />
+              </button>
+            </Link>
           </Dialog.Close>
-        </Dialog.Content>
+        </ModalContainer>
       </Dialog.Portal>
     </Dialog.Root>
   )
 }
 
 export default TrailerModal
+
+const ModalContainer = styled(Dialog.Content)`
+  background: #161616;
+`
+const IFrameContainer = styled.iframe`
+  height: 80%;
+  width: 100%;
+  border-radius: 10px;
+`
