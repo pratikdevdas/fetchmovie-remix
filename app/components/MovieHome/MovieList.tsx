@@ -1,4 +1,5 @@
 import {
+  Form,
   Link,
   useFetcher,
   useLoaderData,
@@ -12,13 +13,12 @@ import TrailerModal from './TrailerModal'
 import { HeartIcon } from '@radix-ui/react-icons'
 
 export default function MovieList() {
-  const { movies, page } = useLoaderData<typeof loader>()
+  const { movies, page, wishlist } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
-  const [wishlist, setWishlist] = useState<number[]>([])
+  // const [wishlist, setWishlist] = useState<number[]>([])
   const genreId = search.get('with_genres')
-
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
       return
@@ -37,14 +37,6 @@ export default function MovieList() {
       setRenderMovies(movies)
     }
   }, [genreId])
-
-  const handleWishlist = (movieId: number) => {
-    if (wishlist.includes(movieId)) {
-      setWishlist(wishlist.filter((f) => f !== movieId))
-    } else {
-      setWishlist([...wishlist, movieId])
-    }
-  }
 
   console.log(wishlist)
   return (
@@ -65,7 +57,7 @@ export default function MovieList() {
               <img
                 src={`https://image.tmdb.org/t/p/w500/${m.poster_path}`}
                 alt="img mov"
-                loading="lazy"
+                loading='lazy'
               />
               <MovieWriteup>
                 <h4>
@@ -79,42 +71,35 @@ export default function MovieList() {
                 <CardBottom>
                   <WatchButton>
                     <Link to={`?index&with_genres=${genreId}&movieId=${m.id}`}>
-                      <TrailerModal
-                        movieId={Number(m.id)}
-                        genreId={Number(genreId)}
-                      />
+                      <TrailerModal movieId={Number(m.id)} genreId={Number(genreId)} />
                     </Link>
                   </WatchButton>
-                  <WishListButton>
-                    {wishlist.includes(Number(m.id)) ? (
-                      <Heart
-                        fill="wishlisted"
-                        height={20}
-                        width={20}
-                        onClick={() => handleWishlist(Number(m.id))}
-                      />
-                    ) : (
-                      <Heart
-                        height={20}
-                        width={20}
-                        onClick={() => handleWishlist(Number(m.id))}
-                      />
-                    )}
-                  </WishListButton>
+
+                  <Form method="post" action='/wishlist' >
+                    <input type="hidden" name="movieId" value={Number(m.id)} />
+                    {
+                      wishlist?.[0].movies.includes(Number(m.id)) ? <WishListButton type='submit' name='actionWishlist' value="delete">
+                        <Heart height={20} width={20} fill='random'/>
+                      </WishListButton> : <WishListButton type='submit' name='actionWishlist' value="create">
+                        <Heart height={20} width={20} />
+                      </WishListButton>
+                    }
+
+                  </Form>
                 </CardBottom>
               </MovieWriteup>
             </MovieCard>
           ))}
-          {fetcher.state === 'loading' && <> </>}
+          {fetcher.state === 'loading' && <>  </>}
         </MovieCardWrapper>
       </MoviesInfiniteScroll>
     </MoviesContainer>
   )
 }
 
-const Heart = styled(HeartIcon)<{ fill?: string }>`
+const Heart = styled(HeartIcon) <{ fill?: string; }>`
   font-size: 48px;
-  background-color: ${(props) => (props.fill ? 'red' : '')};
+  background-color:${props => props.fill ? 'red' : ''};;
 `
 const MoviesContainer = styled.div`
   color: white;
@@ -125,7 +110,7 @@ const CardBottom = styled.div`
   align-items: center;
   justify-content: space-between;
 `
-const WishListButton = styled.div`
+const WishListButton = styled.button`
   display: flex;
   align-items: center;
 `
