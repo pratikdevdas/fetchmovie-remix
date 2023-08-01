@@ -1,8 +1,10 @@
+import { useRef } from 'react'
 import {
   Form,
   Link,
   useFetcher,
   useLoaderData,
+  useNavigation,
   useSearchParams
 } from '@remix-run/react'
 import { useEffect, useState } from 'react'
@@ -11,14 +13,24 @@ import styled from 'styled-components'
 import MoviesInfiniteScroll from './InfiniteScroller'
 import TrailerModal from './TrailerModal'
 import { HeartIcon } from '@radix-ui/react-icons'
+import { v4 as uuidv4 } from 'uuid'
+
+const wishlistId = uuidv4()
+const secretId = uuidv4()
 
 export default function MovieList() {
   const { movies, page, wishlist } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
-  // const [wishlist, setWishlist] = useState<number[]>([])
   const genreId = search.get('with_genres')
+  const navigation = useNavigation()
+
+    const wishlistIdRef = useRef(wishlistId)
+    const secretIdRef = useRef(secretId)
+  const wishlistIsUpdating =
+    navigation.state === 'submitting' || navigation.state === 'loading'
+
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
       return
@@ -38,7 +50,17 @@ export default function MovieList() {
     }
   }, [genreId])
 
+  useEffect(() => {
+    if(wishlistIdRef){
+      localStorage.setItem('wishlistId', wishlistIdRef.current)
+    }
+  },[wishlistIdRef])
+
+  console.log(wishlistId)
+  console.log(wishlistIdRef)
   console.log(wishlist)
+
+
   return (
     <MoviesContainer>
       <MoviesInfiniteScroll
@@ -57,7 +79,7 @@ export default function MovieList() {
               <img
                 src={`https://image.tmdb.org/t/p/w500/${m.poster_path}`}
                 alt="img mov"
-                loading='lazy'
+                loading="lazy"
               />
               <MovieWriteup>
                 <h4>
@@ -71,35 +93,58 @@ export default function MovieList() {
                 <CardBottom>
                   <WatchButton>
                     <Link to={`?index&with_genres=${genreId}&movieId=${m.id}`}>
-                      <TrailerModal movieId={Number(m.id)} genreId={Number(genreId)} />
+                      <TrailerModal
+                        movieId={Number(m.id)}
+                        genreId={Number(genreId)}
+                      />
                     </Link>
                   </WatchButton>
-
-                  <Form method="post" action='/wishlist' >
+                  <Form method="post" action={`/wishlist/${wishlistIdRef}`}>
+                    <input type="hidden" name="wishlistId" value={wishlistIdRef.current} />
+                    <input type="hidden" name="secretId" value={secretIdRef.current} />
                     <input type="hidden" name="movieId" value={Number(m.id)} />
-                    {
-                      wishlist?.[0].movies.includes(Number(m.id)) ? <WishListButton type='submit' name='actionWishlist' value="delete">
-                        <Heart height={20} width={20} fill='random'/>
-                      </WishListButton> : <WishListButton type='submit' name='actionWishlist' value="create">
-                        <Heart height={20} width={20} />
+                    {wishlist?.[0].movies.includes(Number(m.id)) ? (
+                      <WishListButton
+                        type="submit"
+                        name="actionWishlist"
+                        disabled={wishlistIsUpdating}
+                        value="delete"
+                      >
+                        {wishlistIsUpdating ? (
+                          <div>spin</div>
+                        ) : (
+                          <Heart height={20} width={20} fill="any" />
+                        )}
                       </WishListButton>
-                    }
-
+                    ) : (
+                      <WishListButton
+                        type="submit"
+                        name="actionWishlist"
+                        value="create"
+                        disabled={wishlistIsUpdating}
+                      >
+                        {wishlistIsUpdating ? (
+                          <div>spin</div>
+                        ) : (
+                          <Heart height={20} width={20} />
+                        )}
+                      </WishListButton>
+                    )}
                   </Form>
                 </CardBottom>
               </MovieWriteup>
             </MovieCard>
           ))}
-          {fetcher.state === 'loading' && <>  </>}
+          {fetcher.state === 'loading' && <> </>}
         </MovieCardWrapper>
       </MoviesInfiniteScroll>
     </MoviesContainer>
   )
 }
 
-const Heart = styled(HeartIcon) <{ fill?: string; }>`
+const Heart = styled(HeartIcon)<{ fill?: string }>`
   font-size: 48px;
-  background-color:${props => props.fill ? 'red' : ''};;
+  background-color: ${(props) => (props.fill ? 'red' : '')};
 `
 const MoviesContainer = styled.div`
   color: white;
@@ -151,6 +196,7 @@ const MovieWriteup = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  background-color: red;
 
   & h4 {
     font-size: 18px;
@@ -176,6 +222,7 @@ const MovieCard = styled.div`
   transition: all 0.5s cubic-bezier(0.8, 0.5, 0.2, 1.4);
   overflow: hidden;
   position: relative;
+  /* background-color: red; */
   border-radius: 10px;
   & img {
     width: 100%;

@@ -6,7 +6,7 @@ import {
   Meta,
   Outlet,
   Scripts,
-  ScrollRestoration
+  // ScrollRestoration
 } from '@remix-run/react'
 import { createHead } from 'remix-island'
 import main from './styles/main.css'

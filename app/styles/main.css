@@ -12,6 +12,7 @@ html {
 body {
   background: #010101;
   overflow-x: hidden;
+  font-weight: 400;
 }
 
 /* css reset */

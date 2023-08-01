@@ -12,7 +12,7 @@ export default function TopNavbar() {
       </LogoHeader>
       <SearchBar />
       <div>
-        <Link to="/wishlist">Wishlist</Link>
+        <Link to="/wishlist/afa">Wishlist</Link>
         <PopoverWrapper />
       </div>
     </NavWrapper>
