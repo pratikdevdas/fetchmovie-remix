@@ -5,6 +5,7 @@ import MovieList from '~/components/MovieHome/MovieList'
 import styles from '../styles/styles.css'
 import { HomeContainer } from '~/styles/styles'
 import { getWishlist, type WishlistData } from './wishlist.$id'
+
 export const meta: V2_MetaFunction = () => {
   return [
     { title: 'The Movie App' },
@@ -93,9 +94,10 @@ export async function loader({ request }: LoaderArgs) {
   const page = url.searchParams.get('page') || 1
   const genre = url.searchParams.get('with_genres')
   const movieId = url.searchParams.get('movieId')
+  const wishlistId = url.searchParams.get('wl')
   const genres: Genres[] = await getMovieGenreList()
   const movies: Movies = await getMovieList(Number(page), Number(genre))
-  const wishlist: WishlistData[] = await getWishlist()
+  const wishlist: WishlistData[] = await getWishlist(wishlistId ? wishlistId : '')
   if (movieId) {
     const movieTrailerId = await getTrailer(Number(movieId))
     console.log(movieTrailerId)
@@ -111,9 +113,10 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export default function Index() {
+
   return (
     <HomeContainer>
-      <Navbar />
+      <Navbar/>
       <MovieList />
     </HomeContainer>
   )

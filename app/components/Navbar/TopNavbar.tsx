@@ -4,15 +4,15 @@ import styled from 'styled-components'
 import { NavWrapper } from '~/styles/styles'
 import SearchBar from './SearchBar'
 
-export default function TopNavbar() {
+export default function TopNavbar({ url }: {url?:string}) {
   return (
     <NavWrapper>
       <LogoHeader>
-        <Link to="/">The Movie App</Link>
+        <Link to={`/?wl=${url}`}>The Movie App</Link>
       </LogoHeader>
       <SearchBar />
       <div>
-        <Link to="/wishlist/afa">Wishlist</Link>
+        <Link to={`/wishlist/${url}`}>Wishlist</Link>
         <PopoverWrapper />
       </div>
     </NavWrapper>

@@ -1,7 +1,7 @@
 import TopNavbar from '~/components/Navbar/TopNavbar'
 import { HomeContainer, NavContainer } from '~/styles/styles'
 import { Redis } from '@upstash/redis'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData, useParams } from '@remix-run/react'
 import Button from '~/components/Button/Button'
 import {
   json,
@@ -12,12 +12,12 @@ import {
 import styled from 'styled-components'
 
 type LoaderData = {
-  features: Array<[string, boolean]>
+  movies: string[]
 }
 
-export const getWishlist = async () => {
+export const getWishlist = async (id:string) => {
   const redis = Redis.fromEnv()
-  const data = await redis.json.get('wishlist', '$')
+  const data = await redis.json.get(`wishlist${id}`, '$')
   console.log(data, '14')
   return data
 }
@@ -27,65 +27,69 @@ export type WishlistData = {
   movies: number[]
 }
 
-export const loader: LoaderFunction = async () => {
-  // You would want to add authentication/authorization here
-  const wishlist: WishlistData[] = await getWishlist()
+export const loader: LoaderFunction = async ({ params }) => {
+  if(!params.id){
+    return json({ err: 'Invalid Id for some reason' })
+  }
+  console.log(params, '31')
+  const wishlist: WishlistData[] = await getWishlist(params.id)
   // array of all wishlists
-  return { wishlist }
+  console.log(wishlist)
+  return { movies: wishlist[0].movies }
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ request, params }) => {
   // You would want to add authentication/authorization here
   const redis = Redis.fromEnv()
   const formData = await request.formData()
   console.log(formData)
   const values = Object.fromEntries(formData)
   console.log(values, '43')
-  const data = await redis.json.get('wishlist', '$')
-
+  const data = await redis.json.get(`wishlist${values.wishlistId}`, '$')
+console.log(params, '45')
   if (!values.movieId) {
     // This isn't currently displayed in our component
     return json({ error: 'Please provide a feature' })
   }
 
   if (values.actionWishlist === 'create') {
-    console.log(data, '40')
+    // console.log(data, '40')
     if (!data) {
       console.log('hppend')
-      await redis.json.set('wishlist', '$', {
-        id: values.secretId,
+      await redis.json.set(`wishlist${values.wishlistId}`, '$', {
+      secretId: values.secretId,
         movies: []
       })
-      await redis.json.arrappend('wishlist', '$.movies', values.movieId)
-      return redirect('/')
+      await redis.json.arrappend(`wishlist${values.wishlistId}`, '$.movies', values.movieId)
+      return redirect(`/?index&wl=${values.wishlistId}&with_genres=${values.genreId}`)
     } else {
-      await redis.json.arrappend('wishlist', '$.movies', values.movieId)
-      return redirect('/')
+      await redis.json.arrappend(`wishlist${values.wishlistId}`, '$.movies', values.movieId)
+      return redirect(`/?index&wl=${values.wishlistId}&with_genres=${values.genreId}`)
     }
   }
 
   if (values.actionWishlist === 'delete') {
     console.log(values.movieId, '57')
     await redis.json.arrpop(
-      'wishlist',
+      `wishlist${values.wishlistId}`,
       '$.movies',
       data[0].movies.indexOf(Number(values.movieId))
     )
+    return redirect(`/?index&wl=${values.wishlistId}&with_genres=${values.genreId}`)
   }
-  //
-  // console.log(showData,'36')
-  return redirect('/')
+  return json({ error: 'Some Error Happened' })
 }
 
 const Wishlist = () => {
-  const wishlist = useLoaderData<LoaderData>()
-  console.log(wishlist)
+  const { movies } = useLoaderData<LoaderData>()
+  console.log(movies)
+  const params = useParams()
   return (
     <HomeContainer>
       <NavContainer></NavContainer>
-      <TopNavbar />
-
+      <TopNavbar url={params.id?.toString()} />
       <TableWrapper>
+        {movies.map(m => <li key={m}>{m}</li>)}
         <Rtable className="Rtable Rtable--5cols Rtable--collapse">
           <RtableRowHeader>
             <RTableCell className="column-heading name">

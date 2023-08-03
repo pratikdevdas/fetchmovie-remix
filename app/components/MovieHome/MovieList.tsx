@@ -1,10 +1,7 @@
-import { useRef } from 'react'
 import {
-  Form,
   Link,
   useFetcher,
   useLoaderData,
-  useNavigation,
   useSearchParams
 } from '@remix-run/react'
 import { useEffect, useState } from 'react'
@@ -15,21 +12,21 @@ import TrailerModal from './TrailerModal'
 import { HeartIcon } from '@radix-ui/react-icons'
 import { v4 as uuidv4 } from 'uuid'
 
-const wishlistId = uuidv4()
-const secretId = uuidv4()
+const wishlistIdGenerate = uuidv4()
+const secretIdGenerate = uuidv4()
 
 export default function MovieList() {
   const { movies, page, wishlist } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
-  const genreId = search.get('with_genres')
-  const navigation = useNavigation()
+  const genreId = search.get('with_genres') || 'none'
+  const [wishlistId, setWishlistId] = useState(wishlistIdGenerate)
+  const [secretId, setSecretId] = useState(secretIdGenerate)
+  const [newPage, setNewPage] = useState(0)
 
-    const wishlistIdRef = useRef(wishlistId)
-    const secretIdRef = useRef(secretId)
   const wishlistIsUpdating =
-    navigation.state === 'submitting' || navigation.state === 'loading'
+    fetcher.formMethod === 'POST'
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
@@ -37,6 +34,8 @@ export default function MovieList() {
     }
     if (fetcher.data) {
       const newItems = fetcher.data.movies
+      console.log(newItems)
+      console.log(fetcher.data)
       setRenderMovies((prevAssets) => [...prevAssets, ...newItems])
     }
   }, [fetcher.data])
@@ -51,21 +50,28 @@ export default function MovieList() {
   }, [genreId])
 
   useEffect(() => {
-    if(wishlistIdRef){
-      localStorage.setItem('wishlistId', wishlistIdRef.current)
+    const existingSession = window.localStorage.getItem('localUserWishlistData')
+    console.log(existingSession)
+    if (existingSession) {
+      const existingSessionJSON = JSON.parse(existingSession)
+      setWishlistId(existingSessionJSON.wishlistId)
+      setSecretId(existingSessionJSON.secretId)
     }
-  },[wishlistIdRef])
+  }, [])
 
-  console.log(wishlistId)
-  console.log(wishlistIdRef)
-  console.log(wishlist)
 
+  const handleSubmit = () => {
+    window.localStorage.setItem('localUserWishlistData', JSON.stringify({ wishlistId, secretId }))
+  }
 
   return (
     <MoviesContainer>
       <MoviesInfiniteScroll
         loadNext={() => {
-          const pageToFetch = fetcher.data ? fetcher.data.page + 1 : page + 1
+          const pageToFetch = fetcher.data ? fetcher.data.page + 1
+            : newPage ? newPage + 1
+              : page + 1
+          setNewPage(pageToFetch)
           const query = genreId
             ? `?index&with_genres=${genreId}&page=${pageToFetch}`
             : `?index&page=${pageToFetch}`
@@ -99,10 +105,12 @@ export default function MovieList() {
                       />
                     </Link>
                   </WatchButton>
-                  <Form method="post" action={`/wishlist/${wishlistIdRef}`}>
-                    <input type="hidden" name="wishlistId" value={wishlistIdRef.current} />
-                    <input type="hidden" name="secretId" value={secretIdRef.current} />
+                  <fetcher.Form method="post" action={`/wishlist/${wishlistId}`} onSubmit={handleSubmit}>
+                    <input type="hidden" name="wishlistId" value={wishlistId} />
+                    <input type="hidden" name="secretId" value={secretId} />
                     <input type="hidden" name="movieId" value={Number(m.id)} />
+                    {genreId ? <input type="hidden" name="genreId" value={genreId} /> : <input type='hidden' />}
+                    {/* <input type="hidden" name="serverRedirect" value={serverRedirect} /> */}
                     {wishlist?.[0].movies.includes(Number(m.id)) ? (
                       <WishListButton
                         type="submit"
@@ -130,7 +138,7 @@ export default function MovieList() {
                         )}
                       </WishListButton>
                     )}
-                  </Form>
+                  </fetcher.Form>
                 </CardBottom>
               </MovieWriteup>
             </MovieCard>
@@ -142,7 +150,7 @@ export default function MovieList() {
   )
 }
 
-const Heart = styled(HeartIcon)<{ fill?: string }>`
+const Heart = styled(HeartIcon) <{ fill?: string }>`
   font-size: 48px;
   background-color: ${(props) => (props.fill ? 'red' : '')};
 `
