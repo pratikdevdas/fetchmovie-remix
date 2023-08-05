@@ -1,12 +1,12 @@
 import type React from 'react'
 import styled from 'styled-components'
 
-export default function Button(props: {light?:boolean, children:React.ReactNode}) {
+export default function Button(props: {light?:boolean |string, children:React.ReactNode}) {
 	console.log(props)
   return <StyledButton {...props}>{props.children}</StyledButton>
 }
 
-const StyledButton = styled.button<{ light?: boolean; }>`
+const StyledButton = styled.button<{ light?: boolean | string; }>`
   display: block;
   padding: 8px 15px;
   text-align: center;

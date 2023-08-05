@@ -5,7 +5,7 @@ import type { loader } from '~/routes/_index'
 import { useLoaderData } from '@remix-run/react'
 import { NavLink } from '@remix-run/react'
 
-const TabCarousel = ({ url }: {url?:string}) => {
+const TabCarousel = ({ url, secUrl }: {url?:string; secUrl?: string}) => {
   const { genres } = useLoaderData<typeof loader>()
   const responsive = {
     desktop: {
@@ -41,7 +41,7 @@ const TabCarousel = ({ url }: {url?:string}) => {
         >
           {genres.map((g) => (
             <Category key={g.id}>
-              <NavLink prefetch="intent" to={`${url ? `?with_genres=${g.id}&wl=${url}` : `?with_genres=${g.id}`}`}>
+              <NavLink prefetch="intent" to={`${url && secUrl ? `?with_genres=${g.id}&wl=${url}&sid=${secUrl}` : `?with_genres=${g.id}`}`}>
                 {g.name}
               </NavLink>
             </Category>

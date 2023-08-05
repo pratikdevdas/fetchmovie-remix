@@ -2,6 +2,7 @@ import {
   Link,
   useFetcher,
   useLoaderData,
+  useNavigate,
   useSearchParams
 } from '@remix-run/react'
 import { useEffect, useState } from 'react'
@@ -19,14 +20,15 @@ export default function MovieList() {
   const { movies, page, wishlist } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
-  const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
   const genreId = search.get('with_genres') || 'none'
+  const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
   const [wishlistId, setWishlistId] = useState(wishlistIdGenerate)
   const [secretId, setSecretId] = useState(secretIdGenerate)
   const [newPage, setNewPage] = useState(0)
-
+  const navigate = useNavigate()
   const wishlistIsUpdating =
     fetcher.formMethod === 'POST'
+
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
@@ -51,14 +53,15 @@ export default function MovieList() {
 
   useEffect(() => {
     const existingSession = window.localStorage.getItem('localUserWishlistData')
-    console.log(existingSession)
     if (existingSession) {
       const existingSessionJSON = JSON.parse(existingSession)
       setWishlistId(existingSessionJSON.wishlistId)
       setSecretId(existingSessionJSON.secretId)
+      navigate(`/?wl=${existingSessionJSON.wishlistId}&sid=${existingSessionJSON.secretId}`)
+    } else {
+      navigate('/')
     }
   }, [])
-
 
   const handleSubmit = () => {
     window.localStorage.setItem('localUserWishlistData', JSON.stringify({ wishlistId, secretId }))
@@ -98,14 +101,15 @@ export default function MovieList() {
                 <p>Rating: {m.vote_average}</p>
                 <CardBottom>
                   <WatchButton>
-                    <Link to={`?index&with_genres=${genreId}&movieId=${m.id}`}>
+                    <Link to={`?index&with_genres=${genreId}&movieId=${m.id}&wl=${wishlistId}`}>
                       <TrailerModal
                         movieId={Number(m.id)}
                         genreId={Number(genreId)}
+                        wishlistId={wishlistId}
                       />
                     </Link>
                   </WatchButton>
-                  <fetcher.Form method="post" action={`/wishlist/${wishlistId}`} onSubmit={handleSubmit}>
+                  <fetcher.Form method="post" action={`/wishlist/${wishlistId}/${secretId}/admin`} onSubmit={handleSubmit}>
                     <input type="hidden" name="wishlistId" value={wishlistId} />
                     <input type="hidden" name="secretId" value={secretId} />
                     <input type="hidden" name="movieId" value={Number(m.id)} />

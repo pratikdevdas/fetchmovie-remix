@@ -1,19 +1,18 @@
 import { Link } from '@remix-run/react'
-import PopoverWrapper from './Popover'
 import styled from 'styled-components'
 import { NavWrapper } from '~/styles/styles'
 import SearchBar from './SearchBar'
 
-export default function TopNavbar({ url }: {url?:string}) {
+export default function TopNavbar({ url, secUrl }: {url?:string; secUrl?: string}) {
   return (
     <NavWrapper>
       <LogoHeader>
-        <Link to={`/?wl=${url}`}>The Movie App</Link>
+        <Link to={`/?wl=${url}/?sid=${secUrl}`}>The Movie App</Link>
       </LogoHeader>
       <SearchBar />
       <div>
-        <Link to={`/wishlist/${url}`}>Wishlist</Link>
-        <PopoverWrapper />
+        {url && <>editMode</>}
+        <Link to={`/wishlist/${secUrl}/${url}/admin`}>Wishlist</Link>
       </div>
     </NavWrapper>
   )

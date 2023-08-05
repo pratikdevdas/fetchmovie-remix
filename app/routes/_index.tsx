@@ -4,7 +4,7 @@ import Navbar from '~/components/Navbar/Navbar'
 import MovieList from '~/components/MovieHome/MovieList'
 import styles from '../styles/styles.css'
 import { HomeContainer } from '~/styles/styles'
-import { getWishlist, type WishlistData } from './wishlist.$id'
+import { getWishlist, type WishlistData } from './wishlist.$sid.$wid.admin'
 
 export const meta: V2_MetaFunction = () => {
   return [

@@ -1,24 +1,24 @@
 import TopNavbar from '~/components/Navbar/TopNavbar'
 import { HomeContainer, NavContainer } from '~/styles/styles'
 import { Redis } from '@upstash/redis'
-import { useLoaderData, useParams } from '@remix-run/react'
+import { Form, Link, useLoaderData, useParams } from '@remix-run/react'
 import Button from '~/components/Button/Button'
 import {
   json,
   type ActionFunction,
   type LoaderFunction,
-  redirect
+  redirect,
+  fetch
 } from '@remix-run/node'
 import styled from 'styled-components'
+import { uniq } from 'lodash'
+// import { createClient } from '@supabase/supabase-js'
+// import { type Movie } from './_index.tsx'
 
-type LoaderData = {
-  movies: string[]
-}
-
-export const getWishlist = async (id:string) => {
+export const getWishlist = async (id: string) => {
   const redis = Redis.fromEnv()
   const data = await redis.json.get(`wishlist${id}`, '$')
-  console.log(data, '14')
+  console.log(data)
   return data
 }
 
@@ -27,26 +27,48 @@ export type WishlistData = {
   movies: number[]
 }
 
-export const loader: LoaderFunction = async ({ params }) => {
-  if(!params.id){
+const options = {
+  method: 'GET',
+  headers: {
+    accept: 'application/json',
+    Authorization: `Bearer ${process.env.AUTH_TOKEN}`
+  }
+}
+export const loader: LoaderFunction = async ({ request, params }) => {
+  console.log(request)
+  if (!params.wid) {
     return json({ err: 'Invalid Id for some reason' })
   }
   console.log(params, '31')
-  const wishlist: WishlistData[] = await getWishlist(params.id)
-  // array of all wishlists
-  console.log(wishlist)
-  return { movies: wishlist[0].movies }
+  const wishlist: WishlistData[] = await getWishlist(params.wid)
+
+  if (!wishlist) {
+    return json({ status: 'no wishlist' })
+  }
+
+  const url = 'https://api.themoviedb.org/3/movie'
+  const movieList = uniq(wishlist[0].movies)
+  const movieDetailList = await Promise.all(movieList.map(async (n) => {
+    const singleMovieUrl = `${url}/${n}`
+    const res = await fetch(singleMovieUrl, options)
+    const res2 = await res.json()
+    return res2
+  }))
+
+  return { movies: movieDetailList }
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
   // You would want to add authentication/authorization here
+  // const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
+  //   auth: { persistSession: false },
+  // })
+
   const redis = Redis.fromEnv()
   const formData = await request.formData()
   console.log(formData)
   const values = Object.fromEntries(formData)
-  console.log(values, '43')
   const data = await redis.json.get(`wishlist${values.wishlistId}`, '$')
-console.log(params, '45')
   if (!values.movieId) {
     // This isn't currently displayed in our component
     return json({ error: 'Please provide a feature' })
@@ -57,39 +79,47 @@ console.log(params, '45')
     if (!data) {
       console.log('hppend')
       await redis.json.set(`wishlist${values.wishlistId}`, '$', {
-      secretId: values.secretId,
+        secretId: values.secretId,
         movies: []
       })
       await redis.json.arrappend(`wishlist${values.wishlistId}`, '$.movies', values.movieId)
-      return redirect(`/?index&wl=${values.wishlistId}&with_genres=${values.genreId}`)
+      return redirect(`/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`)
     } else {
       await redis.json.arrappend(`wishlist${values.wishlistId}`, '$.movies', values.movieId)
-      return redirect(`/?index&wl=${values.wishlistId}&with_genres=${values.genreId}`)
+      return redirect(`/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`)
     }
   }
 
   if (values.actionWishlist === 'delete') {
-    console.log(values.movieId, '57')
     await redis.json.arrpop(
       `wishlist${values.wishlistId}`,
       '$.movies',
       data[0].movies.indexOf(Number(values.movieId))
     )
-    return redirect(`/?index&wl=${values.wishlistId}&with_genres=${values.genreId}`)
+    return redirect(`/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`)
   }
   return json({ error: 'Some Error Happened' })
 }
 
 const Wishlist = () => {
-  const { movies } = useLoaderData<LoaderData>()
-  console.log(movies)
+  const { movies } = useLoaderData<typeof loader>()
+
   const params = useParams()
+  if (!movies) {
+    return <HomeContainer>
+      <NavContainer>
+        <TopNavbar />
+        <TableWrapper> NothingHere</TableWrapper>
+      </NavContainer>
+    </HomeContainer>
+  }
+
   return (
     <HomeContainer>
       <NavContainer></NavContainer>
       <TopNavbar url={params.id?.toString()} />
       <TableWrapper>
-        {movies.map(m => <li key={m}>{m}</li>)}
+        {/* {movies.map(m => <li key={m}>{m}</li>)} */}
         <Rtable className="Rtable Rtable--5cols Rtable--collapse">
           <RtableRowHeader>
             <RTableCell className="column-heading name">
@@ -101,7 +131,7 @@ const Wishlist = () => {
             <RTableCell className="column-heading buttons">
               <ButtonContainer>
                 <Button>Edit</Button>
-                <Button light>Share</Button>
+                <Form> <Button light="true"> Share </Button></Form>
               </ButtonContainer>
             </RTableCell>
           </RtableRowHeader>
@@ -116,89 +146,35 @@ const Wishlist = () => {
             <RTableCell className="column-heading release">
               Release
             </RTableCell>
-            <RTableCell className="column-heading watch">Random</RTableCell>
           </RtableRowTitle>
 
-          <RtableRow>
+
+          {movies.map((movie: any, index:number) => (<RtableRow key={movie.id} className={index % 2 === 0 ? '' : 'is-striped'}>
             <RTableCell className="name">
               {/* <div className="Rtable-cell--heading">Name</div> */}
-              <div className="Rtable-cell--content date-content">
-                The life of pi
-              </div>
+              <Name to={`/movies/${movie.id}`} className="Rtable-cell--content date-content" >
+                <img
+                  src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
+                  alt="img mov"
+                  loading="lazy"
+                />
+                {movie.title}
+              </Name>
             </RTableCell>
             <RTableCell className="topic-cell rating">
               <div className="Rtable-cell--content title-content">
-                1 2 3 4 5
+                {movie.vote_average}
               </div>
             </RTableCell>
             <RTableCell className="access-link-cell release">
               {/* <div className="Rtable-cell--heading">Access Link</div> */}
               <div className="Rtable-cell--content access-link-content">
                 <a href="#0">
-                  <i className="ion-link"></i>
+                  <i className="ion-link">{movie.release_date}</i>
                 </a>
               </div>
             </RTableCell>
-            <RTableCell className="Rtable-cell watch">
-              {/* <div className="Rtable-cell--heading">Replay</div> */}
-              <div className="Rtable-cell--content replay-link-content">
-                <a href="#0">
-                  <i className="ion-ios-videocam"></i>
-                </a>
-              </div>
-            </RTableCell>
-          </RtableRow>
-
-          <RtableRow className="is-striped">
-            <RTableCell className="date-cell name">
-              {/* <div className="Rtable-cell--heading">Name</div> */}
-              <div className="Rtable-cell--content date-content">
-                The life of pi
-              </div>
-            </RTableCell>
-            <RTableCell className="topic-cell rating">
-              <div className="Rtable-cell--content title-content">
-                1 2 3 4 5
-              </div>
-            </RTableCell>
-            <RTableCell className="access-link-cell release">
-              {/* <div className="Rtable-cell--heading">Access Link</div> */}
-              <div className="Rtable-cell--content access-link-content">
-                <a href="#0">
-                  <i className="ion-link"></i>
-                </a>
-              </div>
-            </RTableCell>
-            <RTableCell className="Rtable-cell watch">
-              {/* <div className="Rtable-cell--heading">Replay</div> */}
-              <div className="Rtable-cell--content replay-link-content">
-                <a href="#0">
-                  <i className="ion-ios-videocam"></i>
-                </a>
-              </div>
-            </RTableCell>
-          </RtableRow>
-          {/* <div className="Rtable-row is-striped">
-            <div className="Rtable-cell date-cell">
-              <div className="Rtable-cell--heading">Date</div>
-              <div className="Rtable-cell--content date-content"><span className="webinar-date">September 6th, 2016</span><br />6:00 pm (CDT)</div>
-            </div>
-            <div className="Rtable-cell topic-cell">
-              <div className="Rtable-cell--content title-content">Cash Flow Genesis</div>
-            </div>
-            <div className="Rtable-cell access-link-cell">
-              <div className="Rtable-cell--heading">Access Link</div>
-              <div className="Rtable-cell--content access-link-content"><a href="#0"><i className="ion-link"></i></a></div>
-            </div>
-            <div className="Rtable-cell replay-link-cell">
-              <div className="Rtable-cell--heading">Replay</div>
-              <div className="Rtable-cell--content replay-link-content"><a href="#0"><i className="ion-ios-videocam"></i></a></div>
-            </div>
-            <div className="Rtable-cell Rtable-cell--foot pdf-cell">
-              <div className="Rtable-cell--heading">Checklist</div>
-              <div className="Rtable-cell--content pdf-content"><a href="#0"><i className="ion-document-text"></i></a></div>
-            </div>
-          </div> */}
+          </RtableRow>))}
         </Rtable>
       </TableWrapper>
     </HomeContainer>
@@ -206,6 +182,7 @@ const Wishlist = () => {
 }
 
 export default Wishlist
+
 
 const TableWrapper = styled.div`
   width: 100%;
@@ -225,7 +202,7 @@ const Rtable = styled.div`
   padding: 0;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
   border-inline: 1px solid white;
-  border-block-start: 1px solid white;
+  border-block-start: 1px solid rgba(0, 0, 0, 0.2);
   border-radius: 10px;
 `
 
@@ -245,7 +222,7 @@ const RtableRow = styled.div`
 `
 
 const RtableRowHeader = styled(RtableRow)`
-  padding-block: 20px;
+  padding: 20px;
   background-color: #161616;
   border-radius: 10px 10px 0 0;
 `
@@ -254,27 +231,26 @@ const RtableRowTitle = styled(RtableRow)`
   background-color: #000;
   font-weight: 500; 
   font-size: 16px;
+  padding: 0.8em 1.2em;
 `
 
 const RTableCell = styled.div`
   box-sizing: border-box;
   flex-grow: 1;
-  padding: 0.8em 1.2em;
   overflow: hidden; // Or flex might break
   list-style: none;
-
+  height: 100%;
+  display: flex;
+align-items: center;
   &.name {
-    width: 30%;
+    width: 40%;
   }
 
   &.rating {
-    width: 20%;
+    width: 30%;
   }
   &.release {
     width: 30%;
-  }
-  &.watch {
-    width: 20%;
   }
 `
 const ButtonContainer = styled.div`
@@ -290,4 +266,17 @@ h3{
 p{
   font-size: 14px;
 }
+`
+
+const Name = styled(Link)`
+  display: flex;
+  align-items: center;
+  /* margin-right: 10px; */
+
+  & img{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin: 0px 10px;
+  }
 `

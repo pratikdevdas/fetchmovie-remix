@@ -6,10 +6,12 @@ import styled from 'styled-components'
 
 const TrailerModal = ({
   movieId,
-  genreId
+  genreId,
+  wishlistId
 }: {
   movieId: number
   genreId: number
+  wishlistId?: string
 }) => {
   const { movieTrailerId } = useLoaderData()
   const navigate = useNavigation()
@@ -45,7 +47,7 @@ const TrailerModal = ({
             </Dialog.Close>
           </div>
           <Dialog.Close asChild>
-            <Link to={`?index&with_genres=${genreId}`}>
+            <Link to={`?index&with_genres=${genreId}&wl=${wishlistId}`}>
               <button className="IconButton" aria-label="Close">
                 <Cross2Icon />
               </button>
