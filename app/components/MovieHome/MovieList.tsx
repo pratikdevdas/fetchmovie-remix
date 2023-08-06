@@ -17,7 +17,7 @@ const wishlistIdGenerate = uuidv4()
 const secretIdGenerate = uuidv4()
 
 export default function MovieList() {
-  const { movies, page } = useLoaderData<typeof loader>()
+  const { movies, page, wishlist } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
   const genreId = search.get('with_genres') || 'none'
@@ -26,6 +26,8 @@ export default function MovieList() {
   const [secretId, setSecretId] = useState(secretIdGenerate)
   const [newPage, setNewPage] = useState(0)
   const navigate = useNavigate()
+
+  console.log(wishlist, '-----------30')
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
@@ -136,12 +138,11 @@ const WishlistUpdate = ({
   genreId: string
   movieId: string | number
 }) => {
-  const { wishlist } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
-  const [wMovies, setWMovies] = useState(wishlist?.[0].movies)
-  console.log(wMovies)
-  // const wishlistIsUpdating = fetcher.formData?.get('movieId') === movieId
-  // console.log(wishlistIsUpdating)
+  const { wishlist } = useLoaderData()
+  // wislist doesnt come on first reload so wait for it to come literally you  are giving some time to the effect to load data from localstorage first
+  const [wMovies, setWMovies] = useState(wishlist ? wishlist?.[0]?.movies : [])
+
   const handleSubmit = () => {
     window.localStorage.setItem(
       'localUserWishlistData',
@@ -149,6 +150,7 @@ const WishlistUpdate = ({
     )
   }
 
+  // if(wishlist)
   return (
     <fetcher.Form
       method="post"
@@ -185,7 +187,7 @@ const WishlistUpdate = ({
           <HeartIcon
             height={20}
             width={20}
-            onClick={() => setWMovies([...wishlist[0].movies, Number(movieId)])}
+            onClick={() => setWMovies([...wMovies, Number(movieId)])}
           />
         </WishListButton>
       )}

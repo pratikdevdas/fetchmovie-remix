@@ -5,6 +5,7 @@ import MovieList from '~/components/MovieHome/MovieList'
 import styles from '../styles/styles.css'
 import { HomeContainer } from '~/styles/styles'
 import { getWishlist, type WishlistData } from './wishlist.$sid.$wid.admin'
+import { useLoaderData } from '@remix-run/react'
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -115,6 +116,8 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export default function Index() {
+  const { wishlist } = useLoaderData()
+  console.log(wishlist, 'index 120')
   return (
     <HomeContainer>
       <Navbar />
