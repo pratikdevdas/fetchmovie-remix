@@ -97,7 +97,9 @@ export async function loader({ request }: LoaderArgs) {
   const wishlistId = url.searchParams.get('wl')
   const genres: Genres[] = await getMovieGenreList()
   const movies: Movies = await getMovieList(Number(page), Number(genre))
-  const wishlist: WishlistData[] = await getWishlist(wishlistId ? wishlistId : '')
+  const wishlist: WishlistData[] = await getWishlist(
+    wishlistId ? wishlistId : ''
+  )
   if (movieId) {
     const movieTrailerId = await getTrailer(Number(movieId))
     console.log(movieTrailerId)
@@ -109,14 +111,13 @@ export async function loader({ request }: LoaderArgs) {
       wishlist
     }
   }
-  return { genres, movies: movies.results, page: Number(page),  wishlist }
+  return { genres, movies: movies.results, page: Number(page), wishlist }
 }
 
 export default function Index() {
-
   return (
     <HomeContainer>
-      <Navbar/>
+      <Navbar />
       <MovieList />
     </HomeContainer>
   )

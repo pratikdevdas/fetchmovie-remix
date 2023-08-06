@@ -10,14 +10,14 @@ import type { Movie, loader } from '~/routes/_index'
 import styled from 'styled-components'
 import MoviesInfiniteScroll from './InfiniteScroller'
 import TrailerModal from './TrailerModal'
-import { HeartIcon } from '@radix-ui/react-icons'
+import { HeartIcon, HeartFilledIcon } from '@radix-ui/react-icons'
 import { v4 as uuidv4 } from 'uuid'
 
 const wishlistIdGenerate = uuidv4()
 const secretIdGenerate = uuidv4()
 
 export default function MovieList() {
-  const { movies, page, wishlist } = useLoaderData<typeof loader>()
+  const { movies, page } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
   const genreId = search.get('with_genres') || 'none'
@@ -26,9 +26,6 @@ export default function MovieList() {
   const [secretId, setSecretId] = useState(secretIdGenerate)
   const [newPage, setNewPage] = useState(0)
   const navigate = useNavigate()
-  const wishlistIsUpdating =
-    fetcher.formMethod === 'POST'
-
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
@@ -57,23 +54,23 @@ export default function MovieList() {
       const existingSessionJSON = JSON.parse(existingSession)
       setWishlistId(existingSessionJSON.wishlistId)
       setSecretId(existingSessionJSON.secretId)
-      navigate(`/?wl=${existingSessionJSON.wishlistId}&sid=${existingSessionJSON.secretId}`)
+      navigate(
+        `/?wl=${existingSessionJSON.wishlistId}&sid=${existingSessionJSON.secretId}`
+      )
     } else {
       navigate('/')
     }
   }, [])
 
-  const handleSubmit = () => {
-    window.localStorage.setItem('localUserWishlistData', JSON.stringify({ wishlistId, secretId }))
-  }
-
   return (
     <MoviesContainer>
       <MoviesInfiniteScroll
         loadNext={() => {
-          const pageToFetch = fetcher.data ? fetcher.data.page + 1
-            : newPage ? newPage + 1
-              : page + 1
+          const pageToFetch = fetcher.data
+            ? fetcher.data.page + 1
+            : newPage
+            ? newPage + 1
+            : page + 1
           setNewPage(pageToFetch)
           const query = genreId
             ? `?index&with_genres=${genreId}&page=${pageToFetch}`
@@ -101,7 +98,9 @@ export default function MovieList() {
                 <p>Rating: {m.vote_average}</p>
                 <CardBottom>
                   <WatchButton>
-                    <Link to={`?index&with_genres=${genreId}&movieId=${m.id}&wl=${wishlistId}`}>
+                    <Link
+                      to={`?index&with_genres=${genreId}&movieId=${m.id}&wl=${wishlistId}`}
+                    >
                       <TrailerModal
                         movieId={Number(m.id)}
                         genreId={Number(genreId)}
@@ -109,40 +108,12 @@ export default function MovieList() {
                       />
                     </Link>
                   </WatchButton>
-                  <fetcher.Form method="post" action={`/wishlist/${wishlistId}/${secretId}/admin`} onSubmit={handleSubmit}>
-                    <input type="hidden" name="wishlistId" value={wishlistId} />
-                    <input type="hidden" name="secretId" value={secretId} />
-                    <input type="hidden" name="movieId" value={Number(m.id)} />
-                    {genreId ? <input type="hidden" name="genreId" value={genreId} /> : <input type='hidden' />}
-                    {/* <input type="hidden" name="serverRedirect" value={serverRedirect} /> */}
-                    {wishlist?.[0].movies.includes(Number(m.id)) ? (
-                      <WishListButton
-                        type="submit"
-                        name="actionWishlist"
-                        disabled={wishlistIsUpdating}
-                        value="delete"
-                      >
-                        {wishlistIsUpdating ? (
-                          <div>spin</div>
-                        ) : (
-                          <Heart height={20} width={20} fill="any" />
-                        )}
-                      </WishListButton>
-                    ) : (
-                      <WishListButton
-                        type="submit"
-                        name="actionWishlist"
-                        value="create"
-                        disabled={wishlistIsUpdating}
-                      >
-                        {wishlistIsUpdating ? (
-                          <div>spin</div>
-                        ) : (
-                          <Heart height={20} width={20} />
-                        )}
-                      </WishListButton>
-                    )}
-                  </fetcher.Form>
+                  <WishlistUpdate
+                    wishlistId={wishlistId}
+                    secretId={secretId}
+                    genreId={genreId}
+                    movieId={m.id}
+                  />
                 </CardBottom>
               </MovieWriteup>
             </MovieCard>
@@ -154,9 +125,76 @@ export default function MovieList() {
   )
 }
 
-const Heart = styled(HeartIcon) <{ fill?: string }>`
+const WishlistUpdate = ({
+  wishlistId,
+  secretId,
+  genreId,
+  movieId
+}: {
+  wishlistId: string
+  secretId: string
+  genreId: string
+  movieId: string | number
+}) => {
+  const { wishlist } = useLoaderData<typeof loader>()
+  const fetcher = useFetcher<typeof loader>()
+  const [wMovies, setWMovies] = useState(wishlist?.[0].movies)
+  console.log(wMovies)
+  // const wishlistIsUpdating = fetcher.formData?.get('movieId') === movieId
+  // console.log(wishlistIsUpdating)
+  const handleSubmit = () => {
+    window.localStorage.setItem(
+      'localUserWishlistData',
+      JSON.stringify({ wishlistId, secretId })
+    )
+  }
+
+  return (
+    <fetcher.Form
+      method="post"
+      action={`/wishlist/${wishlistId}/${secretId}/admin`}
+      onSubmit={handleSubmit}
+    >
+      <input type="hidden" name="wishlistId" value={wishlistId} />
+      <input type="hidden" name="secretId" value={secretId} />
+      <input type="hidden" name="movieId" value={Number(movieId)} />
+      {genreId ? (
+        <input type="hidden" name="genreId" value={genreId} />
+      ) : (
+        <input type="hidden" />
+      )}
+      {/* <input type="hidden" name="serverRedirect" value={serverRedirect} /> */}
+      {wMovies.includes(Number(movieId)) ? (
+        <WishListButton
+          type="submit"
+          name="actionWishlist"
+          // disabled={wishlistIsUpdating}
+          value="delete"
+        >
+          <HeartFilled
+            height={20}
+            width={20}
+            fill="currentColor"
+            onClick={() =>
+              setWMovies(wMovies.filter((f) => f !== Number(movieId)))
+            }
+          />
+        </WishListButton>
+      ) : (
+        <WishListButton type="submit" name="actionWishlist" value="create">
+          <HeartIcon
+            height={20}
+            width={20}
+            onClick={() => setWMovies([...wishlist[0].movies, Number(movieId)])}
+          />
+        </WishListButton>
+      )}
+    </fetcher.Form>
+  )
+}
+const HeartFilled = styled(HeartFilledIcon)<{ fill?: string }>`
   font-size: 48px;
-  background-color: ${(props) => (props.fill ? 'red' : '')};
+  color: violet;
 `
 const MoviesContainer = styled.div`
   color: white;

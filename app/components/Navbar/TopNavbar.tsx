@@ -3,11 +3,17 @@ import styled from 'styled-components'
 import { NavWrapper } from '~/styles/styles'
 import SearchBar from './SearchBar'
 
-export default function TopNavbar({ url, secUrl }: {url?:string; secUrl?: string}) {
+export default function TopNavbar({
+  url,
+  secUrl
+}: {
+  url?: string
+  secUrl?: string
+}) {
   return (
     <NavWrapper>
       <LogoHeader>
-        <Link to={`/?wl=${url}/?sid=${secUrl}`}>The Movie App</Link>
+        <Link to={`/?wl=${url}&sid=${secUrl}`}>The Movie App</Link>
       </LogoHeader>
       <SearchBar />
       <div>

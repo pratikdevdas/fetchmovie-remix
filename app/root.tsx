@@ -5,7 +5,7 @@ import {
   LiveReload,
   Meta,
   Outlet,
-  Scripts,
+  Scripts
   // ScrollRestoration
 } from '@remix-run/react'
 import { createHead } from 'remix-island'

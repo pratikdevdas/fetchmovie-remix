@@ -48,12 +48,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const url = 'https://api.themoviedb.org/3/movie'
   const movieList = uniq(wishlist[0].movies)
-  const movieDetailList = await Promise.all(movieList.map(async (n) => {
-    const singleMovieUrl = `${url}/${n}`
-    const res = await fetch(singleMovieUrl, options)
-    const res2 = await res.json()
-    return res2
-  }))
+  const movieDetailList = await Promise.all(
+    movieList.map(async (n) => {
+      const singleMovieUrl = `${url}/${n}`
+      const res = await fetch(singleMovieUrl, options)
+      const res2 = await res.json()
+      return res2
+    })
+  )
 
   return { movies: movieDetailList }
 }
@@ -82,11 +84,23 @@ export const action: ActionFunction = async ({ request, params }) => {
         secretId: values.secretId,
         movies: []
       })
-      await redis.json.arrappend(`wishlist${values.wishlistId}`, '$.movies', values.movieId)
-      return redirect(`/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`)
+      await redis.json.arrappend(
+        `wishlist${values.wishlistId}`,
+        '$.movies',
+        values.movieId
+      )
+      return redirect(
+        `/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
+      )
     } else {
-      await redis.json.arrappend(`wishlist${values.wishlistId}`, '$.movies', values.movieId)
-      return redirect(`/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`)
+      await redis.json.arrappend(
+        `wishlist${values.wishlistId}`,
+        '$.movies',
+        values.movieId
+      )
+      return redirect(
+        `/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
+      )
     }
   }
 
@@ -96,7 +110,9 @@ export const action: ActionFunction = async ({ request, params }) => {
       '$.movies',
       data[0].movies.indexOf(Number(values.movieId))
     )
-    return redirect(`/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`)
+    return redirect(
+      `/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
+    )
   }
   return json({ error: 'Some Error Happened' })
 }
@@ -106,12 +122,14 @@ const Wishlist = () => {
 
   const params = useParams()
   if (!movies) {
-    return <HomeContainer>
-      <NavContainer>
-        <TopNavbar />
-        <TableWrapper> NothingHere</TableWrapper>
-      </NavContainer>
-    </HomeContainer>
+    return (
+      <HomeContainer>
+        <NavContainer>
+          <TopNavbar />
+          <TableWrapper> NothingHere</TableWrapper>
+        </NavContainer>
+      </HomeContainer>
+    )
   }
 
   return (
@@ -128,53 +146,57 @@ const Wishlist = () => {
                 <p>Here is a lovely watchlist</p>
               </TableHeader>
             </RTableCell>
-            <RTableCell className="column-heading buttons">
+            <RTableCell className="head">
               <ButtonContainer>
                 <Button>Edit</Button>
-                <Form> <Button light="true"> Share </Button></Form>
+                <Form>
+                  {' '}
+                  <Button light="true"> Share </Button>
+                </Form>
               </ButtonContainer>
             </RTableCell>
           </RtableRowHeader>
 
           <RtableRowTitle>
-            <RTableCell className="column-heading name">
-              Name
-            </RTableCell>
-            <RTableCell className="column-heading rating">
-              Rating
-            </RTableCell>
-            <RTableCell className="column-heading release">
-              Release
-            </RTableCell>
+            <RTableCell className="column-heading name">Name</RTableCell>
+            <RTableCell className="column-heading rating">Rating</RTableCell>
+            <RTableCell className="column-heading release">Release</RTableCell>
           </RtableRowTitle>
 
-
-          {movies.map((movie: any, index:number) => (<RtableRow key={movie.id} className={index % 2 === 0 ? '' : 'is-striped'}>
-            <RTableCell className="name">
-              {/* <div className="Rtable-cell--heading">Name</div> */}
-              <Name to={`/movies/${movie.id}`} className="Rtable-cell--content date-content" >
-                <img
-                  src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
-                  alt="img mov"
-                  loading="lazy"
-                />
-                {movie.title}
-              </Name>
-            </RTableCell>
-            <RTableCell className="topic-cell rating">
-              <div className="Rtable-cell--content title-content">
-                {movie.vote_average}
-              </div>
-            </RTableCell>
-            <RTableCell className="access-link-cell release">
-              {/* <div className="Rtable-cell--heading">Access Link</div> */}
-              <div className="Rtable-cell--content access-link-content">
-                <a href="#0">
-                  <i className="ion-link">{movie.release_date}</i>
-                </a>
-              </div>
-            </RTableCell>
-          </RtableRow>))}
+          {movies.map((movie: any, index: number) => (
+            <RtableRow
+              key={movie.id}
+              className={index % 2 === 0 ? '' : 'is-striped'}
+            >
+              <RTableCell className="name">
+                {/* <div className="Rtable-cell--heading">Name</div> */}
+                <Name
+                  to={`/movies/${movie.id}`}
+                  className="Rtable-cell--content date-content"
+                >
+                  <img
+                    src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
+                    alt="img mov"
+                    loading="lazy"
+                  />
+                  {movie.title}
+                </Name>
+              </RTableCell>
+              <RTableCell className="topic-cell rating">
+                <div className="Rtable-cell--content title-content">
+                  {movie.vote_average}
+                </div>
+              </RTableCell>
+              <RTableCell className="access-link-cell release">
+                {/* <div className="Rtable-cell--heading">Access Link</div> */}
+                <div className="Rtable-cell--content access-link-content">
+                  <a href="#0">
+                    <i className="ion-link">{movie.release_date}</i>
+                  </a>
+                </div>
+              </RTableCell>
+            </RtableRow>
+          ))}
         </Rtable>
       </TableWrapper>
     </HomeContainer>
@@ -182,7 +204,6 @@ const Wishlist = () => {
 }
 
 export default Wishlist
-
 
 const TableWrapper = styled.div`
   width: 100%;
@@ -202,7 +223,7 @@ const Rtable = styled.div`
   padding: 0;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
   border-inline: 1px solid white;
-  border-block-start: 1px solid rgba(0, 0, 0, 0.2);
+  border-block-start: 1px solid white;
   border-radius: 10px;
 `
 
@@ -229,7 +250,7 @@ const RtableRowHeader = styled(RtableRow)`
 const RtableRowTitle = styled(RtableRow)`
   padding-block: 0;
   background-color: #000;
-  font-weight: 500; 
+  font-weight: 500;
   font-size: 16px;
   padding: 0.8em 1.2em;
 `
@@ -241,7 +262,7 @@ const RTableCell = styled.div`
   list-style: none;
   height: 100%;
   display: flex;
-align-items: center;
+  align-items: center;
   &.name {
     width: 40%;
   }
@@ -252,20 +273,23 @@ align-items: center;
   &.release {
     width: 30%;
   }
+  &.head {
+    justify-content: end;
+  }
 `
 const ButtonContainer = styled.div`
   display: flex;
   justify-content: end;
-  gap:10px;
+  gap: 10px;
 `
 
 const TableHeader = styled.div`
-h3{
- font-size: 20px;
-}
-p{
-  font-size: 14px;
-}
+  h3 {
+    font-size: 20px;
+  }
+  p {
+    font-size: 14px;
+  }
 `
 
 const Name = styled(Link)`
@@ -273,7 +297,7 @@ const Name = styled(Link)`
   align-items: center;
   /* margin-right: 10px; */
 
-  & img{
+  & img {
     width: 50px;
     height: 50px;
     border-radius: 50%;
