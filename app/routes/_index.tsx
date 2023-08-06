@@ -116,8 +116,6 @@ export async function loader({ request }: LoaderArgs) {
 }
 
 export default function Index() {
-  const { wishlist } = useLoaderData()
-  console.log(wishlist, 'index 120')
   return (
     <HomeContainer>
       <Navbar />

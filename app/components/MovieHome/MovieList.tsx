@@ -27,7 +27,7 @@ export default function MovieList() {
   const [newPage, setNewPage] = useState(0)
   const navigate = useNavigate()
 
-  console.log(wishlist, '-----------30')
+  // console.log(wishlist, '-----------30')
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
@@ -83,42 +83,13 @@ export default function MovieList() {
       >
         <MovieCardWrapper>
           {renderMovies.map((m) => (
-            <MovieCard key={m.id}>
-              <img
-                src={`https://image.tmdb.org/t/p/w500/${m.poster_path}`}
-                alt="img mov"
-                loading="lazy"
-              />
-              <MovieWriteup>
-                <h4>
-                  <Link to={`movies/${m.id}`}>{m.title}</Link>
-                </h4>
-                <p>
-                  {m.overview.substring(0, 170)}
-                  <span> ...readmore </span>
-                </p>
-                <p>Rating: {m.vote_average}</p>
-                <CardBottom>
-                  <WatchButton>
-                    <Link
-                      to={`?index&with_genres=${genreId}&movieId=${m.id}&wl=${wishlistId}`}
-                    >
-                      <TrailerModal
-                        movieId={Number(m.id)}
-                        genreId={Number(genreId)}
-                        wishlistId={wishlistId}
-                      />
-                    </Link>
-                  </WatchButton>
-                  <WishlistUpdate
-                    wishlistId={wishlistId}
-                    secretId={secretId}
-                    genreId={genreId}
-                    movieId={m.id}
-                  />
-                </CardBottom>
-              </MovieWriteup>
-            </MovieCard>
+            <MovieItem
+              m={m}
+              key={m.id}
+              wishlistId={wishlistId}
+              secretId={secretId}
+              genreId={genreId}
+            />
           ))}
           {fetcher.state === 'loading' && <> </>}
         </MovieCardWrapper>
@@ -127,21 +98,27 @@ export default function MovieList() {
   )
 }
 
-const WishlistUpdate = ({
+const MovieItem = ({
+  m,
   wishlistId,
   secretId,
-  genreId,
-  movieId
+  genreId
 }: {
+  m: Movie
   wishlistId: string
   secretId: string
   genreId: string
-  movieId: string | number
 }) => {
   const fetcher = useFetcher<typeof loader>()
   const { wishlist } = useLoaderData()
   // wislist doesnt come on first reload so wait for it to come literally you  are giving some time to the effect to load data from localstorage first
-  const [wMovies, setWMovies] = useState(wishlist ? wishlist?.[0]?.movies : [])
+  // const [wMovies, setWMovies] = useState(wishlist ? wishlist?.[0]?.movies : [])
+  // console.log(wishlist?.[0]?.movies)
+
+  const isWishlisting =
+    Number(fetcher.formData?.get('movieId')) === m.id ||
+    fetcher.state === 'submitting'
+    console.log(fetcher)
 
   const handleSubmit = () => {
     window.localStorage.setItem(
@@ -152,51 +129,91 @@ const WishlistUpdate = ({
 
   // if(wishlist)
   return (
-    <fetcher.Form
-      method="post"
-      action={`/wishlist/${wishlistId}/${secretId}/admin`}
-      onSubmit={handleSubmit}
-    >
-      <input type="hidden" name="wishlistId" value={wishlistId} />
-      <input type="hidden" name="secretId" value={secretId} />
-      <input type="hidden" name="movieId" value={Number(movieId)} />
-      {genreId ? (
-        <input type="hidden" name="genreId" value={genreId} />
-      ) : (
-        <input type="hidden" />
-      )}
-      {/* <input type="hidden" name="serverRedirect" value={serverRedirect} /> */}
-      {wMovies.includes(Number(movieId)) ? (
-        <WishListButton
-          type="submit"
-          name="actionWishlist"
-          // disabled={wishlistIsUpdating}
-          value="delete"
-        >
-          <HeartFilled
-            height={20}
-            width={20}
-            fill="currentColor"
-            onClick={() =>
-              setWMovies(wMovies.filter((f) => f !== Number(movieId)))
-            }
-          />
-        </WishListButton>
-      ) : (
-        <WishListButton type="submit" name="actionWishlist" value="create">
-          <HeartIcon
-            height={20}
-            width={20}
-            onClick={() => setWMovies([...wMovies, Number(movieId)])}
-          />
-        </WishListButton>
-      )}
-    </fetcher.Form>
+    <MovieCard key={m.id}>
+      <img
+        src={`https://image.tmdb.org/t/p/w500/${m.poster_path}`}
+        alt="img mov"
+        loading="lazy"
+      />
+      <MovieWriteup>
+        <h4>
+          <Link to={`movies/${m.id}`}>{m.title}</Link>
+        </h4>
+        <p>
+          {m.overview.substring(0, 170)}
+          <span> {m.id}</span>
+        </p>
+        <p>Rating: {m.vote_average}</p>
+        <CardBottom>
+          <WatchButton>
+            <Link
+              to={`?index&with_genres=${genreId}&movieId=${m.id}&wl=${wishlistId}`}
+            >
+              <TrailerModal
+                movieId={Number(m.id)}
+                genreId={Number(genreId)}
+                wishlistId={wishlistId}
+              />
+            </Link>
+          </WatchButton>
+          <fetcher.Form
+            method="post"
+            action={`/wishlist/${wishlistId}/${secretId}/admin`}
+            onSubmit={handleSubmit}
+          >
+            <input type="hidden" name="wishlistId" value={wishlistId} />
+            <input type="hidden" name="secretId" value={secretId} />
+            <input type="hidden" name="movieId" value={Number(m.id)} />
+            {genreId ? (
+              <input type="hidden" name="genreId" value={genreId} />
+            ) : (
+              <input type="hidden" />
+            )}
+            {/* <input type="hidden" name="serverRedirect" value={serverRedirect} /> */}
+            {wishlist?.[0]?.movies.includes(Number(m.id)) ? (
+              <WishListButton
+                type="submit"
+                name="actionWishlist"
+                disabled={isWishlisting}
+                value="delete"
+              >
+                {isWishlisting ? (
+                  <HeartIcon
+                    height={20}
+                    width={20}
+                    // fill="currentColor"
+                  />
+                ) : (
+                  <HeartFilled height={20} width={20} fill="currentColor" />
+                )}
+              </WishListButton>
+            ) : (
+              <WishListButton
+                type="submit"
+                name="actionWishlist"
+                disabled={isWishlisting}
+                value="create"
+              >
+                {isWishlisting ? (
+                  <HeartFilled height={20} width={20} fill="currentColor" />
+                ) : (
+                  <HeartIcon
+                    height={20}
+                    width={20}
+                  />
+                )}
+              </WishListButton>
+            )}
+          </fetcher.Form>
+        </CardBottom>
+      </MovieWriteup>
+    </MovieCard>
   )
 }
 const HeartFilled = styled(HeartFilledIcon)<{ fill?: string }>`
   font-size: 48px;
   color: violet;
+  transition: all 1s ease-in-out;
 `
 const MoviesContainer = styled.div`
   color: white;
