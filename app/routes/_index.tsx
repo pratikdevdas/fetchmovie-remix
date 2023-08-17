@@ -5,7 +5,6 @@ import MovieList from '~/components/MovieHome/MovieList'
 import styles from '../styles/styles.css'
 import { HomeContainer } from '~/styles/styles'
 import { getWishlist, type WishlistData } from './wishlist.$sid.$wid.admin'
-import { useLoaderData } from '@remix-run/react'
 
 export const meta: V2_MetaFunction = () => {
   return [
@@ -34,6 +33,7 @@ export interface Movie {
   backdrop_path: string
   overview: string
   vote_average: number
+  // release_date?: string
 }
 export interface Movies {
   page: number
@@ -90,29 +90,28 @@ const getTrailer = async (trailer: number) => {
   }
 }
 export async function loader({ request }: LoaderArgs) {
-  const url = new URL(request.url)
-  // console.log(request.cookies)
-  const page = url.searchParams.get('page') || 1
-  const genre = url.searchParams.get('with_genres')
-  const movieId = url.searchParams.get('movieId')
-  const wishlistId = url.searchParams.get('wl')
-  const genres: Genres[] = await getMovieGenreList()
-  const movies: Movies = await getMovieList(Number(page), Number(genre))
-  const wishlist: WishlistData[] = await getWishlist(
-    wishlistId ? wishlistId : ''
-  )
-  if (movieId) {
-    const movieTrailerId = await getTrailer(Number(movieId))
-    console.log(movieTrailerId)
-    return {
-      genres,
-      movies: movies.results,
-      page: Number(page),
-      movieTrailerId,
-      wishlist
+    const url = new URL(request.url)
+    // console.log(request.cookies)
+    const page = url.searchParams.get('page') || 1
+    const genre = url.searchParams.get('with_genres')
+    const movieId = url.searchParams.get('movieId')
+    const wishlistId = url.searchParams.get('wl')
+    const genres: Genres[] = await getMovieGenreList()
+    const movies: Movies = await getMovieList(Number(page), Number(genre))
+    const wishlist: WishlistData[] = await getWishlist(
+      wishlistId ? wishlistId : ''
+    )
+    if (movieId) {
+      const movieTrailerId = await getTrailer(Number(movieId))
+      return {
+        genres,
+        movies: movies.results,
+        page: Number(page),
+        movieTrailerId,
+        wishlist
+      }
     }
-  }
-  return { genres, movies: movies.results, page: Number(page), wishlist }
+    return { genres, movies: movies.results, page: Number(page), wishlist }
 }
 
 export default function Index() {

@@ -1,4 +1,4 @@
-import { Link } from '@remix-run/react'
+import { Link, useParams } from '@remix-run/react'
 import styled from 'styled-components'
 import { NavWrapper } from '~/styles/styles'
 import SearchBar from './SearchBar'
@@ -10,6 +10,13 @@ export default function TopNavbar({
   url?: string
   secUrl?: string
 }) {
+  const params = useParams()
+
+  if (!secUrl && !url) {
+    secUrl = params.sid
+    url = params.wid
+  }
+
   return (
     <NavWrapper>
       <LogoHeader>

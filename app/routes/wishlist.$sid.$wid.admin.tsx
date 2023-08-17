@@ -3,6 +3,7 @@ import { HomeContainer, NavContainer } from '~/styles/styles'
 import { Redis } from '@upstash/redis'
 import { Form, Link, useLoaderData, useParams } from '@remix-run/react'
 import Button from '~/components/Button/Button'
+import type { Movie } from './_index'
 import {
   json,
   type ActionFunction,
@@ -12,13 +13,15 @@ import {
 } from '@remix-run/node'
 import styled from 'styled-components'
 import { uniq } from 'lodash'
+import { useEffect } from 'react'
+import ShareModal from '~/components/Wishlist/ShareModal'
 // import { createClient } from '@supabase/supabase-js'
 // import { type Movie } from './_index.tsx'
+import styles from '../styles/styles.css'
 
 export const getWishlist = async (id: string) => {
   const redis = Redis.fromEnv()
   const data = await redis.json.get(`wishlist${id}`, '$')
-  console.log(data)
   return data
 }
 
@@ -35,11 +38,9 @@ const options = {
   }
 }
 export const loader: LoaderFunction = async ({ request, params }) => {
-  console.log(request)
   if (!params.wid) {
     return json({ err: 'Invalid Id for some reason' })
   }
-  console.log(params, '31')
   const wishlist: WishlistData[] = await getWishlist(params.wid)
 
   if (!wishlist) {
@@ -48,27 +49,27 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const url = 'https://api.themoviedb.org/3/movie'
   const movieList = uniq(wishlist[0].movies)
-  const movieDetailList = await Promise.all(
-    movieList.map(async (n) => {
-      const singleMovieUrl = `${url}/${n}`
-      const res = await fetch(singleMovieUrl, options)
-      const res2 = await res.json()
-      return res2
-    })
-  )
 
-  return { movies: movieDetailList }
+  // const fetchPromises = movieList.map
+  console.log(movieList)
+  const movieDetailList = movieList.map((n) => {
+    const singleMovieUrl = `${url}/${n}`
+    return fetch(singleMovieUrl, options)
+  })
+  try {
+    const responses = await Promise.all(movieDetailList)
+    const dataArray = await Promise.all(responses.map(response => response.json()))
+    return { movies: dataArray }
+  } catch(error) {
+    console.log(error)
+    return { movies: [] }
+  }
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  // You would want to add authentication/authorization here
-  // const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_ANON_KEY!, {
-  //   auth: { persistSession: false },
-  // })
 
   const redis = Redis.fromEnv()
   const formData = await request.formData()
-  console.log(formData)
   const values = Object.fromEntries(formData)
   const data = await redis.json.get(`wishlist${values.wishlistId}`, '$')
   if (!values.movieId) {
@@ -79,7 +80,6 @@ export const action: ActionFunction = async ({ request, params }) => {
   if (values.actionWishlist === 'create') {
     // console.log(data, '40')
     if (!data) {
-      console.log('hppend')
       await redis.json.set(`wishlist${values.wishlistId}`, '$', {
         secretId: values.secretId,
         movies: []
@@ -117,10 +117,30 @@ export const action: ActionFunction = async ({ request, params }) => {
   return json({ error: 'Some Error Happened' })
 }
 
+export const links = () => {
+  return [
+    {
+      rel: 'stylesheet',
+      href: styles
+    }
+  ]
+}
+
+
 const Wishlist = () => {
   const { movies } = useLoaderData<typeof loader>()
 
   const params = useParams()
+
+  useEffect(() => {
+    if (params.sid && params.uid) {
+      localStorage.setItem(
+        'localUserWishlistData',
+        JSON.stringify({ wishlistId: params.wid, secretId: params.sid })
+      )
+    }
+  }, [params])
+
   if (!movies) {
     return (
       <HomeContainer>
@@ -131,6 +151,7 @@ const Wishlist = () => {
       </HomeContainer>
     )
   }
+
 
   return (
     <HomeContainer>
@@ -149,10 +170,9 @@ const Wishlist = () => {
             <RTableCell className="head">
               <ButtonContainer>
                 <Button>Edit</Button>
-                <Form>
-                  {' '}
-                  <Button light="true"> Share </Button>
-                </Form>
+                <Button light="true">
+                  <ShareModal />
+                </Button>
               </ButtonContainer>
             </RTableCell>
           </RtableRowHeader>
@@ -163,7 +183,7 @@ const Wishlist = () => {
             <RTableCell className="column-heading release">Release</RTableCell>
           </RtableRowTitle>
 
-          {movies.map((movie: any, index: number) => (
+          {movies.map((movie: Movie, index: number) => (
             <RtableRow
               key={movie.id}
               className={index % 2 === 0 ? '' : 'is-striped'}
@@ -171,11 +191,11 @@ const Wishlist = () => {
               <RTableCell className="name">
                 {/* <div className="Rtable-cell--heading">Name</div> */}
                 <Name
-                  to={`/movies/${movie.id}`}
+                  to={'/movies'}
                   className="Rtable-cell--content date-content"
                 >
                   <img
-                    src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
+                    // src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
                     alt="img mov"
                     loading="lazy"
                   />

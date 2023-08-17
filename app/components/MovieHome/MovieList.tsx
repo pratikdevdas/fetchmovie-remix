@@ -17,7 +17,7 @@ const wishlistIdGenerate = uuidv4()
 const secretIdGenerate = uuidv4()
 
 export default function MovieList() {
-  const { movies, page, wishlist } = useLoaderData<typeof loader>()
+  const { movies, page } = useLoaderData<typeof loader>()
   const fetcher = useFetcher<typeof loader>()
   const [search] = useSearchParams()
   const genreId = search.get('with_genres') || 'none'
@@ -35,8 +35,6 @@ export default function MovieList() {
     }
     if (fetcher.data) {
       const newItems = fetcher.data.movies
-      console.log(newItems)
-      console.log(fetcher.data)
       setRenderMovies((prevAssets) => [...prevAssets, ...newItems])
     }
   }, [fetcher.data])
@@ -118,7 +116,6 @@ const MovieItem = ({
   const isWishlisting =
     Number(fetcher.formData?.get('movieId')) === m.id ||
     fetcher.state === 'submitting'
-    console.log(fetcher)
 
   const handleSubmit = () => {
     window.localStorage.setItem(
@@ -147,12 +144,13 @@ const MovieItem = ({
         <CardBottom>
           <WatchButton>
             <Link
-              to={`?index&with_genres=${genreId}&movieId=${m.id}&wl=${wishlistId}`}
+              to={`?index&with_genres=${genreId}&movieId=${m.id}&wl=${wishlistId}&sid=${secretId}`}
             >
               <TrailerModal
                 movieId={Number(m.id)}
                 genreId={Number(genreId)}
                 wishlistId={wishlistId}
+                secretId={secretId}
               />
             </Link>
           </WatchButton>
@@ -197,10 +195,7 @@ const MovieItem = ({
                 {isWishlisting ? (
                   <HeartFilled height={20} width={20} fill="currentColor" />
                 ) : (
-                  <HeartIcon
-                    height={20}
-                    width={20}
-                  />
+                  <HeartIcon height={20} width={20} />
                 )}
               </WishListButton>
             )}
