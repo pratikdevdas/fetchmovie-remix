@@ -16,9 +16,9 @@ const options = {
 	}
 }
 
-const getEntriesByQuerystring = async(q: string) => {
+const getEntriesByQuerystring = async (q: string) => {
 	const url = `https://api.themoviedb.org/3/search/movie?query=${q}`
-    const response = await fetch(url, options)
+	const response = await fetch(url, options)
 	const res = await response.json()
 	return res
 }
@@ -28,13 +28,13 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
 	const { q } = Object.fromEntries(url.searchParams)
 	const movies = await getEntriesByQuerystring(q)
 	console.log(q, 'q')
-	if (!q){
-		return movies.results = []
+	if (!q) {
+		json({ q, movies: [] })
 	}
-	if (movies) {
-		movies.results = []
+	if (!movies.result) {
+		return json({ q, movies: [] })
 	}
-	return json({ q, movies })
+	return json({ q, movies: movies.result })
 }
 
 const Search = () => {
@@ -57,6 +57,7 @@ const Search = () => {
 
 	// const [search] = useSearchParams()
 	// console.log(search)
+
 	return (
   <div>
     <HomeContainer>
@@ -65,10 +66,10 @@ const Search = () => {
 
         <span color='red'>
           {isDebouncing || navigation.state === 'loading'
-						? 'searching...'
-						: null}
+							? 'searching...'
+							: null}
         </span>
-        {movies.results.map((n: Movie) => <li key={n.id}>
+        {movies.map((n: Movie) => <li key={n.id}>
           {n.title}
         </li>)}
       </SearchContainer>
