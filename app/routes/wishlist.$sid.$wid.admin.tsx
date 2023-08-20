@@ -1,7 +1,7 @@
 import TopNavbar from '~/components/Navbar/TopNavbar'
 import { HomeContainer, NavContainer } from '~/styles/styles'
 import { Redis } from '@upstash/redis'
-import { Form, Link, useLoaderData, useParams } from '@remix-run/react'
+import {  Link, useLoaderData, useParams } from '@remix-run/react'
 import Button from '~/components/Button/Button'
 import type { Movie } from './_index'
 import {
@@ -13,11 +13,12 @@ import {
 } from '@remix-run/node'
 import styled from 'styled-components'
 import { uniq } from 'lodash'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import ShareModal from '~/components/Wishlist/ShareModal'
 // import { createClient } from '@supabase/supabase-js'
 // import { type Movie } from './_index.tsx'
 import styles from '../styles/styles.css'
+import { ScissorsIcon } from '@radix-ui/react-icons'
 
 export const getWishlist = async (id: string) => {
   const redis = Redis.fromEnv()
@@ -129,7 +130,7 @@ export const links = () => {
 
 const Wishlist = () => {
   const { movies } = useLoaderData<typeof loader>()
-
+  const [edit, setEdit] = useState(false)
   const params = useParams()
 
   useEffect(() => {
@@ -169,7 +170,7 @@ const Wishlist = () => {
             </RTableCell>
             <RTableCell className="head">
               <ButtonContainer>
-                <Button>Edit</Button>
+                <Button onClick={() => setEdit(!edit)}>{edit ? 'Cancel' : 'Edit'}</Button>
                 <Button light="true">
                   <ShareModal />
                 </Button>
@@ -181,6 +182,7 @@ const Wishlist = () => {
             <RTableCell className="column-heading name">Name</RTableCell>
             <RTableCell className="column-heading rating">Rating</RTableCell>
             <RTableCell className="column-heading release">Release</RTableCell>
+            {edit && <RTableCell className="column-heading delete">Delete</RTableCell>}
           </RtableRowTitle>
 
           {movies.map((movie: Movie, index: number) => (
@@ -195,7 +197,7 @@ const Wishlist = () => {
                   className="Rtable-cell--content date-content"
                 >
                   <img
-                    // src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
+                    src={`https://image.tmdb.org/t/p/w200/${movie.poster_path}`}
                     alt="img mov"
                     loading="lazy"
                   />
@@ -215,6 +217,11 @@ const Wishlist = () => {
                   </a>
                 </div>
               </RTableCell>
+              {edit && <RTableCell className="access-link-cell delete">
+                <div className="Rtable-cell--content access-link-content">
+                  <ScissorsIcon />
+                </div>
+              </RTableCell>}
             </RtableRow>
           ))}
         </Rtable>
@@ -230,7 +237,6 @@ const TableWrapper = styled.div`
   max-width: 1280px;
   margin: 10px auto;
   padding: 1em;
-  /* background-color: red; */
   color: #d9d9d9;
   font-size: 14px;
   font-weight: 400px;
@@ -288,10 +294,13 @@ const RTableCell = styled.div`
   }
 
   &.rating {
-    width: 30%;
+    width: 25%;
   }
   &.release {
-    width: 30%;
+    width: 25%;
+  }
+  &.delete{
+    width: 10%;
   }
   &.head {
     justify-content: end;

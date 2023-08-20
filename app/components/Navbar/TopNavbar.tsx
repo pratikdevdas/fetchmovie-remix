@@ -2,13 +2,18 @@ import { Link, useParams } from '@remix-run/react'
 import styled from 'styled-components'
 import { NavWrapper } from '~/styles/styles'
 import SearchBar from './SearchBar'
+import type React from 'react'
 
 export default function TopNavbar({
   url,
-  secUrl
+  secUrl,
+  setQuery,
+  query
 }: {
   url?: string
   secUrl?: string
+  setQuery?:(e: React.ChangeEvent<HTMLInputElement>)=>string
+  query? : string
 }) {
   const params = useParams()
 
@@ -22,9 +27,8 @@ export default function TopNavbar({
       <LogoHeader>
         <Link to={`/?wl=${url}&sid=${secUrl}`}>The Movie App</Link>
       </LogoHeader>
-      <SearchBar />
+      <SearchBar query={query} setQuery={setQuery}/>
       <div>
-        {url && <>editMode</>}
         <Link to={`/wishlist/${secUrl}/${url}/admin`}>Wishlist</Link>
       </div>
     </NavWrapper>

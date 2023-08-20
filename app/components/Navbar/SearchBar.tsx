@@ -1,8 +1,15 @@
+import { useNavigate } from '@remix-run/react'
 import { styled } from 'styled-components'
-const SearchBar = () => {
+
+const SearchBar = ({ query, setQuery }: {
+  query: string, setQuery: (e: string) => void
+}) => {
+
+  const navigate = useNavigate()
+  console.log(query)
   return (
     <Container>
-      <InputBar placeholder="Search" type="search" />
+      <InputBar onFocus={() => navigate('/search')} onChange={(e) => setQuery(e.target.value)} placeholder="Search" type="search" value={query}/>
       <Image src="/search.svg" alt="search-icon" srcSet="" />
     </Container>
   )

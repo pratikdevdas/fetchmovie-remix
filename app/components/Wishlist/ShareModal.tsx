@@ -1,10 +1,15 @@
 import * as Dialog from '@radix-ui/react-dialog'
-import { useLocation } from '@remix-run/react'
+import { useLocation, useParams } from '@remix-run/react'
 import styled from 'styled-components'
 
 const ShareModal = () => {
 
+  const params = useParams()
+  console.log(params)
+  const baseUrl = 'https://fetchmovie-remix.vercel.app'
   const location = useLocation()
+  const adminLink = `${baseUrl}${location.pathname}`
+  const viewLink = `${baseUrl}/wishlist/${params.wid}/view`
   console.log(location)
   return (
     <Dialog.Root>
@@ -21,22 +26,20 @@ const ShareModal = () => {
             </p>
             <LinkWrapper>
               <p>
-                Link to share
+                {viewLink}
               </p>
             </LinkWrapper>
           </LinkContainer>
           <LinkContainer>
             <p>
-              Share this to let people see your wishlist
+              Keep this link with you to edit the wishlist in future (Do not share)
             </p>
             <LinkWrapper>
               <p>
-                Link to share
+                {adminLink}
               </p>
             </LinkWrapper>
           </LinkContainer>
-          <ShareTitle>Or share with</ShareTitle>
-          <ShareTitle>Share Wishlist</ShareTitle>
           <div
             style={{
               display: 'flex',
@@ -45,7 +48,7 @@ const ShareModal = () => {
             }}
           >
             <Dialog.Close asChild>
-              <button className="Button green">Save changes</button>
+              <button className="Button green">Close</button>
             </Dialog.Close>
           </div>
           <Dialog.Close asChild></Dialog.Close>
@@ -93,12 +96,12 @@ const LinkWrapper = styled.div`
  border-radius: 8px;
 width: full;
 text-align: center;
-padding: 2px 2px;
+padding: 1px;
 margin: 5px 36px;
 background: linear-gradient(to right, red, purple);
 & p{
   border-radius: 8px;
-padding: 6px 6px;
+  padding: 6px 6px;
   background: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.57) 100%);
   
 }
