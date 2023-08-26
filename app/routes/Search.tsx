@@ -1,6 +1,6 @@
 import type { LoaderFunction } from '@remix-run/node'
 import { json, type LoaderArgs } from '@remix-run/node'
-import { useLoaderData, useNavigate, useNavigation, useSearchParams, useSubmit } from '@remix-run/react'
+import { useLoaderData, useNavigate, useNavigation, useSearchParams } from '@remix-run/react'
 import { useEffect, useState } from 'react'
 import TopNavbar from '~/components/Navbar/TopNavbar'
 import { useDebounce } from '~/hooks/useDebounce'
@@ -28,32 +28,29 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
 	const { q } = Object.fromEntries(url.searchParams)
 	const movies = await getEntriesByQuerystring(q)
 	console.log(q, 'q')
+	console.log(movies.results)
 	if (!q) {
 		json({ q, movies: [] })
 	}
-	if (!movies.result) {
-		return json({ q, movies: [] })
-	}
-	return json({ q, movies: movies.result })
+	return json({ q, movies: movies.results })
 }
 
 const Search = () => {
-	const { q, movies } = useLoaderData<typeof loader>()
-	const [query, setQuery] = useState(q)
+	const { movies } = useLoaderData<typeof loader>()
+	const [searchParams, setSearchParams] = useSearchParams()
+	const [query, setQuery] = useState(searchParams.get('q'))
 	const [debouncedQuery, isDebouncing] = useDebounce(query, 500)
-	const submit = useSubmit()
-	const [searchParams] = useSearchParams()
+
 	const navigation = useNavigation()
+	const navigate = useNavigate()
 	useEffect(() => {
 		if (debouncedQuery) {
-			searchParams.set('q', debouncedQuery)
+			setSearchParams({ q: debouncedQuery })
 		} else {
-			searchParams.delete('q')
+			navigate('/')
 		}
-		console.log(searchParams)
-		// this submit sets the value
-		submit(searchParams)
-	}, [debouncedQuery])
+	}, [debouncedQuery, setSearchParams])
+	// never call navigate or it will go to initial
 
 	// const [search] = useSearchParams()
 	// console.log(search)
@@ -61,9 +58,8 @@ const Search = () => {
 	return (
   <div>
     <HomeContainer>
-      <TopNavbar query={query} setQuery={setQuery} isDebouncing />
+      <TopNavbar query={query} setQuery={setQuery} focus={true} />
       <SearchContainer>
-
         <span color='red'>
           {isDebouncing || navigation.state === 'loading'
 							? 'searching...'

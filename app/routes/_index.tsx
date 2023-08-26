@@ -26,7 +26,7 @@ export interface Genres {
   id: number
   name: string
 }
-export interface Movie {
+export interface  Movie {
   id: number | string
   title: string
   poster_path: string
