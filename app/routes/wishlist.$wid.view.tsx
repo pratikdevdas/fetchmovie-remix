@@ -1,14 +1,10 @@
 import TopNavbar from '~/components/Navbar/TopNavbar'
 import { HomeContainer, NavContainer } from '~/styles/styles'
 import { Redis } from '@upstash/redis'
-import {  Link, useLoaderData } from '@remix-run/react'
+import { Link, useLoaderData } from '@remix-run/react'
 import Button from '~/components/Button/Button'
 import type { Movie } from './_index'
-import {
-  json,
-  type LoaderFunction,
-  fetch
-} from '@remix-run/node'
+import { json, type LoaderFunction, fetch } from '@remix-run/node'
 import styled from 'styled-components'
 import { uniq } from 'lodash'
 import ShareModal from '~/components/Wishlist/ShareModal'
@@ -55,9 +51,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   })
   try {
     const responses = await Promise.all(movieDetailList)
-    const dataArray = await Promise.all(responses.map(response => response.json()))
+    const dataArray = await Promise.all(
+      responses.map((response) => response.json())
+    )
     return { movies: dataArray }
-  } catch(error) {
+  } catch (error) {
     console.log(error)
     return { movies: [] }
   }
@@ -71,7 +69,6 @@ export const links = () => {
     }
   ]
 }
-
 
 const Wishlist = () => {
   const { movies } = useLoaderData<typeof loader>()

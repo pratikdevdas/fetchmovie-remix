@@ -10,7 +10,6 @@ export default function Navbar() {
   const url = search.get('wl') || 'none'
   const secUrl = search.get('sid') || 'none'
 
-
   const [query, setQuery] = useState(search.get('q') || '')
   const [debouncedQuery] = useDebounce(query, 1000)
   const navigate = useNavigate()

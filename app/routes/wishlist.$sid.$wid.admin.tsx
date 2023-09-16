@@ -1,7 +1,7 @@
 import TopNavbar from '~/components/Navbar/TopNavbar'
 import { HomeContainer, NavContainer } from '~/styles/styles'
 import { Redis } from '@upstash/redis'
-import {  Link, useLoaderData, useParams } from '@remix-run/react'
+import { Link, useLoaderData, useParams } from '@remix-run/react'
 import Button from '~/components/Button/Button'
 import type { Movie } from './_index'
 import {
@@ -59,16 +59,17 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   })
   try {
     const responses = await Promise.all(movieDetailList)
-    const dataArray = await Promise.all(responses.map(response => response.json()))
+    const dataArray = await Promise.all(
+      responses.map((response) => response.json())
+    )
     return { movies: dataArray }
-  } catch(error) {
+  } catch (error) {
     console.log(error)
     return { movies: [] }
   }
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-
   const redis = Redis.fromEnv()
   const formData = await request.formData()
   const values = Object.fromEntries(formData)
@@ -127,7 +128,6 @@ export const links = () => {
   ]
 }
 
-
 const Wishlist = () => {
   const { movies } = useLoaderData<typeof loader>()
   const [edit, setEdit] = useState(false)
@@ -153,7 +153,6 @@ const Wishlist = () => {
     )
   }
 
-
   return (
     <HomeContainer>
       <NavContainer></NavContainer>
@@ -170,7 +169,9 @@ const Wishlist = () => {
             </RTableCell>
             <RTableCell className="head">
               <ButtonContainer>
-                <Button onClick={() => setEdit(!edit)}>{edit ? 'Cancel' : 'Edit'}</Button>
+                <Button onClick={() => setEdit(!edit)}>
+                  {edit ? 'Cancel' : 'Edit'}
+                </Button>
                 <Button light="true">
                   <ShareModal />
                 </Button>
@@ -182,7 +183,9 @@ const Wishlist = () => {
             <RTableCell className="column-heading name">Name</RTableCell>
             <RTableCell className="column-heading rating">Rating</RTableCell>
             <RTableCell className="column-heading release">Release</RTableCell>
-            {edit && <RTableCell className="column-heading delete">Delete</RTableCell>}
+            {edit && (
+              <RTableCell className="column-heading delete">Delete</RTableCell>
+            )}
           </RtableRowTitle>
 
           {movies.map((movie: Movie, index: number) => (
@@ -217,11 +220,13 @@ const Wishlist = () => {
                   </a>
                 </div>
               </RTableCell>
-              {edit && <RTableCell className="access-link-cell delete">
-                <div className="Rtable-cell--content access-link-content">
-                  <ScissorsIcon />
-                </div>
-              </RTableCell>}
+              {edit && (
+                <RTableCell className="access-link-cell delete">
+                  <div className="Rtable-cell--content access-link-content">
+                    <ScissorsIcon />
+                  </div>
+                </RTableCell>
+              )}
             </RtableRow>
           ))}
         </Rtable>
@@ -299,7 +304,7 @@ const RTableCell = styled.div`
   &.release {
     width: 25%;
   }
-  &.delete{
+  &.delete {
     width: 10%;
   }
   &.head {

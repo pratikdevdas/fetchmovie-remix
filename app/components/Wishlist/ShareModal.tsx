@@ -3,7 +3,6 @@ import { useLocation, useParams } from '@remix-run/react'
 import styled from 'styled-components'
 
 const ShareModal = () => {
-
   const params = useParams()
   console.log(params)
   const baseUrl = 'https://fetchmovie-remix.vercel.app'
@@ -11,6 +10,8 @@ const ShareModal = () => {
   const adminLink = `${baseUrl}${location.pathname}`
   const viewLink = `${baseUrl}/wishlist/${params.wid}/view`
   console.log(location)
+  const isViewPage = location.pathname.includes('view')
+  console.log(isViewPage)
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
@@ -21,25 +22,24 @@ const ShareModal = () => {
         <ModalContainer className="DialogContent wishlist">
           <ShareTitle>Share Wishlist</ShareTitle>
           <LinkContainer>
-            <p>
-              Share this to let people see your wishlist
-            </p>
+            <p>Share this to let people see this wishlist</p>
             <LinkWrapper>
-              <p>
-                {viewLink}
-              </p>
+              <p>{viewLink}</p>
             </LinkWrapper>
           </LinkContainer>
-          <LinkContainer>
-            <p>
-              Keep this link with you to edit the wishlist in future (Do not share)
-            </p>
-            <LinkWrapper>
+          (
+          {!isViewPage && (
+            <LinkContainer>
               <p>
-                {adminLink}
+                Keep this link with you to edit the wishlist in future (Do not
+                share)
               </p>
-            </LinkWrapper>
-          </LinkContainer>
+              <LinkWrapper>
+                <p>{adminLink}</p>
+              </LinkWrapper>
+            </LinkContainer>
+          )}
+          )
           <div
             style={{
               display: 'flex',
@@ -64,8 +64,8 @@ const ModalContainer = styled(Dialog.Content)`
   background: #161616;
   display: flex;
   flex-direction: column;
-    justify-content: space-between;
-  &.wishlist{
+  justify-content: space-between;
+  &.wishlist {
     padding: 56px;
   }
 `
@@ -75,34 +75,33 @@ const ShareTitle = styled(Dialog.Title)`
   font-size: 32px;
   font-weight: 500;
   font-family: 'Roboto', sans-serif;
-  `
+`
 
 const LinkContainer = styled.div`
- background-color: #0A0A0A;
- padding: 36px 0;
- width: full;
- color: #fff;
- display: flex;
- justify-content: center;
- flex-direction: column;
- align-items: stretch;
- text-align: center;
- border-radius: 16px;
- & p{
-   opacity: 0.7;
- }
+  background-color: #0a0a0a;
+  padding: 36px 0;
+  width: full;
+  color: #fff;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: stretch;
+  text-align: center;
+  border-radius: 16px;
+  & p {
+    opacity: 0.7;
+  }
 `
 const LinkWrapper = styled.div`
- border-radius: 8px;
-width: full;
-text-align: center;
-padding: 1px;
-margin: 5px 36px;
-background: linear-gradient(to right, red, purple);
-& p{
   border-radius: 8px;
-  padding: 6px 6px;
-  background: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.57) 100%);
-  
-}
+  width: full;
+  text-align: center;
+  padding: 1px;
+  margin: 5px 36px;
+  background: linear-gradient(to right, red, purple);
+  & p {
+    border-radius: 8px;
+    padding: 6px 6px;
+    background: linear-gradient(180deg, #000 0%, rgba(0, 0, 0, 0.57) 100%);
+  }
 `

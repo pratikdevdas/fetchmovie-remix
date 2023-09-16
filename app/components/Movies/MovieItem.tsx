@@ -1,102 +1,11 @@
-import {
-  Link,
-  useFetcher,
-  useLoaderData,
-  useNavigate,
-  useSearchParams
-} from '@remix-run/react'
-import { useEffect, useState } from 'react'
-import type { Movie, loader } from '~/routes/_index'
+import { HeartFilledIcon, HeartIcon } from '@radix-ui/react-icons'
+import { Link, useFetcher, useLoaderData } from '@remix-run/react'
 import styled from 'styled-components'
-import MoviesInfiniteScroll from './InfiniteScroller'
+import { type Movie } from '~/routes/_index'
+import type { loader } from '~/routes/wishlist.$sid.$wid.admin'
 import TrailerModal from './TrailerModal'
-import { HeartIcon, HeartFilledIcon } from '@radix-ui/react-icons'
-import { v4 as uuidv4 } from 'uuid'
 
-const wishlistIdGenerate = uuidv4()
-const secretIdGenerate = uuidv4()
-
-export default function MovieList() {
-  const { movies, page } = useLoaderData<typeof loader>()
-  const fetcher = useFetcher<typeof loader>()
-  const [search] = useSearchParams()
-  const genreId = search.get('with_genres') || 'none'
-  const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
-  const [wishlistId, setWishlistId] = useState(wishlistIdGenerate)
-  const [secretId, setSecretId] = useState(secretIdGenerate)
-  const [newPage, setNewPage] = useState(0)
-  const navigate = useNavigate()
-
-  // console.log(wishlist, '-----------30')
-
-  useEffect(() => {
-    if (!fetcher.data || fetcher.state === 'loading') {
-      return
-    }
-    if (fetcher.data) {
-      const newItems = fetcher.data.movies
-      setRenderMovies((prevAssets) => [...prevAssets, ...newItems])
-    }
-  }, [fetcher.data])
-
-  useEffect(() => {
-    if (fetcher.data) {
-      setRenderMovies([])
-      fetcher.load(`?index&with_genres=${genreId}`)
-    } else {
-      setRenderMovies(movies)
-    }
-  }, [genreId])
-
-  useEffect(() => {
-    const existingSession = window.localStorage.getItem('localUserWishlistData')
-    if (existingSession) {
-      const existingSessionJSON = JSON.parse(existingSession)
-      setWishlistId(existingSessionJSON.wishlistId)
-      setSecretId(existingSessionJSON.secretId)
-      navigate(
-        `/?wl=${existingSessionJSON.wishlistId}&sid=${existingSessionJSON.secretId}`
-      )
-    } else {
-      navigate('/')
-    }
-  }, [])
-
-  return (
-    <MoviesContainer>
-      <MoviesInfiniteScroll
-        loadNext={() => {
-          const pageToFetch = fetcher.data
-            ? fetcher.data.page + 1
-            : newPage
-            ? newPage + 1
-            : page + 1
-          setNewPage(pageToFetch)
-          const query = genreId
-            ? `?index&with_genres=${genreId}&page=${pageToFetch}`
-            : `?index&page=${pageToFetch}`
-          fetcher.load(query)
-        }}
-        loading={fetcher.state === 'loading'}
-      >
-        <MovieCardWrapper>
-          {renderMovies.map((m) => (
-            <MovieItem
-              m={m}
-              key={m.id}
-              wishlistId={wishlistId}
-              secretId={secretId}
-              genreId={genreId}
-            />
-          ))}
-          {fetcher.state === 'loading' && <> </>}
-        </MovieCardWrapper>
-      </MoviesInfiniteScroll>
-    </MoviesContainer>
-  )
-}
-
-const MovieItem = ({
+export const MovieItem = ({
   m,
   wishlistId,
   secretId,
@@ -105,7 +14,7 @@ const MovieItem = ({
   m: Movie
   wishlistId: string
   secretId: string
-  genreId: string
+  genreId?: string
 }) => {
   const fetcher = useFetcher<typeof loader>()
   const { wishlist } = useLoaderData()
@@ -205,14 +114,7 @@ const MovieItem = ({
     </MovieCard>
   )
 }
-const HeartFilled = styled(HeartFilledIcon)<{ fill?: string }>`
-  font-size: 48px;
-  color: violet;
-  transition: all 1s ease-in-out;
-`
-const MoviesContainer = styled.div`
-  color: white;
-`
+
 const CardBottom = styled.div`
   display: flex;
   gap: 5px;
@@ -224,11 +126,11 @@ const WishListButton = styled.button`
   align-items: center;
 `
 const WatchButton = styled.button``
-const MovieCardWrapper = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  column-gap: 30px;
-  row-gap: 20px;
+
+const HeartFilled = styled(HeartFilledIcon)<{ fill?: string }>`
+  font-size: 48px;
+  color: violet;
+  transition: all 1s ease-in-out;
 `
 
 const MovieWriteup = styled.div`

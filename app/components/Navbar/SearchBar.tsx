@@ -1,16 +1,20 @@
 import { styled } from 'styled-components'
 
-
 export type SearchInputProps = {
   query: string
-  setQuery: (value: string) => void;
+  setQuery: (value: string) => void
   focus?: boolean
 }
 const SearchBar = ({ query, setQuery, focus }: SearchInputProps) => {
-
   return (
     <Container>
-      <InputBar value={query} onChange={(e) => setQuery(e.target.value)} autoFocus={focus} placeholder="Search for a movie" type="text" />
+      <InputBar
+        value={query}
+        onChange={(e) => setQuery(e.target.value)}
+        autoFocus={focus}
+        placeholder="Search for a movie"
+        type="text"
+      />
       <Image src="/search.svg" alt="search-icon" srcSet="" />
     </Container>
   )

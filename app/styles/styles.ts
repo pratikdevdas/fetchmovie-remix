@@ -18,4 +18,10 @@ export const HomeContainer = styled.div`
   margin: 0 auto;
 `
 
-// Modal Styles
+// card wrapper
+export const MovieCardWrapper = styled.div`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  column-gap: 30px;
+  row-gap: 20px;
+`
