@@ -50,17 +50,24 @@ const Search = () => {
   const navigation = useNavigation()
   const navigate = useNavigate()
   useEffect(() => {
-    if (debouncedQuery) {
+    const existingSession = window.localStorage.getItem('localUserWishlistData')
+    if (debouncedQuery && !existingSession) {
       setSearchParams({ q: debouncedQuery })
+    }
+      else if(debouncedQuery && existingSession){
+      const existingSessionJSON = JSON.parse(existingSession)
+      setSearchParams({ q: debouncedQuery, wid: existingSessionJSON.wishlistId, sid: existingSessionJSON.secretId })
     } else {
       navigate('/')
     }
   }, [debouncedQuery, setSearchParams])
 
+ const secUrl =  searchParams.get('sid')
+ const url =  searchParams.get('wid')
   return (
     <div>
       <HomeContainer>
-        <TopNavbar query={query} setQuery={setQuery} focus={true} />
+        <TopNavbar query={query} setQuery={setQuery} focus={true} url={url} secUrl={secUrl} />
         <SearchContainer>
           <span color="red">
             {isDebouncing || navigation.state === 'loading'
@@ -72,8 +79,10 @@ const Search = () => {
               <MovieItem
                 m={m}
                 key={m.id}
-                wishlistId="{wishlistId}"
-                secretId="{secretId}"
+                wishlistId={url || ''}
+                secretId={secUrl || ''}
+                source='search'
+                q={query}
               />
             ))}
           </MovieCardWrapper>

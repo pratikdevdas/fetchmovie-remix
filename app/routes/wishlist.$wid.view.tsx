@@ -1,4 +1,3 @@
-import TopNavbar from '~/components/Navbar/TopNavbar'
 import { HomeContainer, NavContainer } from '~/styles/styles'
 import { Redis } from '@upstash/redis'
 import { Link, useLoaderData } from '@remix-run/react'
@@ -77,7 +76,6 @@ const Wishlist = () => {
     return (
       <HomeContainer>
         <NavContainer>
-          <TopNavbar />
           <TableWrapper> NothingHere</TableWrapper>
         </NavContainer>
       </HomeContainer>

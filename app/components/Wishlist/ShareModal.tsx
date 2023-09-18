@@ -15,7 +15,7 @@ const ShareModal = () => {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button> share</button>
+        <button>Share</button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="DialogOverlay" />

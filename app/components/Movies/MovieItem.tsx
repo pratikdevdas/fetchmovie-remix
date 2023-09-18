@@ -9,12 +9,16 @@ export const MovieItem = ({
   m,
   wishlistId,
   secretId,
-  genreId
+  genreId,
+  source,
+  q
 }: {
   m: Movie
   wishlistId: string
   secretId: string
   genreId?: string
+  source: string
+  q?: string
 }) => {
   const fetcher = useFetcher<typeof loader>()
   const { wishlist } = useLoaderData()
@@ -71,6 +75,8 @@ export const MovieItem = ({
             <input type="hidden" name="wishlistId" value={wishlistId} />
             <input type="hidden" name="secretId" value={secretId} />
             <input type="hidden" name="movieId" value={Number(m.id)} />
+            <input type="hidden" name="source" value={source ? source : ''} />
+            <input type="hidden" name="q" value={q ? q : ''} />
             {genreId ? (
               <input type="hidden" name="genreId" value={genreId} />
             ) : (
@@ -162,7 +168,6 @@ const MovieWriteup = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  background-color: red;
 
   & h4 {
     font-size: 18px;
@@ -188,17 +193,17 @@ const MovieCard = styled.div`
   transition: all 0.5s cubic-bezier(0.8, 0.5, 0.2, 1.4);
   overflow: hidden;
   position: relative;
-  /* background-color: red; */
   border-radius: 10px;
   & img {
     width: 100%;
     height: 100%;
     transition: all 0.5s cubic-bezier(0.8, 0.5, 0.2, 1.4);
   }
+  box-shadow: 0px 2px 3px rgba(124, 0, 240, 0.5) ;
 
   &:hover {
     /* transition: all 0.5s cubic-bezier(0.8, 0.5, 0.2, 1.4); */
-    box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0px 2px 3px rgba(124, 0, 240, 0.3);
     transform: scale(1.05);
     border: 2px solid #15191f;
     & img {

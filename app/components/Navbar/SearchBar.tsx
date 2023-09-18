@@ -33,7 +33,7 @@ const InputBar = styled.input`
   box-sizing: border-box;
   border-radius: 15px;
   letter-spacing: 0.5px;
-  background: var(--gray-dark-2, #0e0e0e);
+  background: var(--gray-dark-2, #495057);
   backdrop-filter: blur(21.5px);
   color: #fff;
   border: none;

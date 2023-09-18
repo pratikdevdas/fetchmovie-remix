@@ -18,11 +18,12 @@ import ShareModal from '~/components/Wishlist/ShareModal'
 // import { createClient } from '@supabase/supabase-js'
 // import { type Movie } from './_index.tsx'
 import styles from '../styles/styles.css'
-import { ScissorsIcon } from '@radix-ui/react-icons'
+import { TrashIcon } from '@radix-ui/react-icons'
 
 export const getWishlist = async (id: string) => {
   const redis = Redis.fromEnv()
   const data = await redis.json.get(`wishlist${id}`, '$')
+  console.log(data,'stop re')
   return data
 }
 
@@ -52,7 +53,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const movieList = uniq(wishlist[0].movies)
 
   // const fetchPromises = movieList.map
-  console.log(movieList)
   const movieDetailList = movieList.map((n) => {
     const singleMovieUrl = `${url}/${n}`
     return fetch(singleMovieUrl, options)
@@ -91,8 +91,9 @@ export const action: ActionFunction = async ({ request, params }) => {
         '$.movies',
         values.movieId
       )
+      console.log(values)
       return redirect(
-        `/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
+        `/${values.source}?${values.q ? `q=${values.q}` : 'index'}&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
       )
     } else {
       await redis.json.arrappend(
@@ -101,7 +102,7 @@ export const action: ActionFunction = async ({ request, params }) => {
         values.movieId
       )
       return redirect(
-        `/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
+        `/${values.source}?${values.q ? `q=${values.q}` : 'index'}&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
       )
     }
   }
@@ -113,7 +114,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       data[0].movies.indexOf(Number(values.movieId))
     )
     return redirect(
-      `/?index&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
+      `/${values.source}?${values.q ? `q=${values.q}` : 'index'}&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
     )
   }
   return json({ error: 'Some Error Happened' })
@@ -146,7 +147,7 @@ const Wishlist = () => {
     return (
       <HomeContainer>
         <NavContainer>
-          <TopNavbar />
+          {/* <TopNavbar /> */}
           <TableWrapper> NothingHere</TableWrapper>
         </NavContainer>
       </HomeContainer>
@@ -155,7 +156,6 @@ const Wishlist = () => {
 
   return (
     <HomeContainer>
-      <NavContainer></NavContainer>
       <TopNavbar url={params.id?.toString()} />
       <TableWrapper>
         {/* {movies.map(m => <li key={m}>{m}</li>)} */}
@@ -169,6 +169,9 @@ const Wishlist = () => {
             </RTableCell>
             <RTableCell className="head">
               <ButtonContainer>
+                {edit && <Button>
+                  Add a Movie
+                </Button>}
                 <Button onClick={() => setEdit(!edit)}>
                   {edit ? 'Cancel' : 'Edit'}
                 </Button>
@@ -223,7 +226,7 @@ const Wishlist = () => {
               {edit && (
                 <RTableCell className="access-link-cell delete">
                   <div className="Rtable-cell--content access-link-content">
-                    <ScissorsIcon />
+                    <TrashIconHolder />
                   </div>
                 </RTableCell>
               )}
@@ -253,15 +256,12 @@ const Rtable = styled.div`
   margin: 0 0 3em 0;
   padding: 0;
   box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
-  border-inline: 1px solid white;
-  border-block-start: 1px solid white;
   border-radius: 10px;
 `
 
 const RtableRow = styled.div`
   width: 100%;
   display: flex;
-  border-block-end: 1px solid white;
   padding-block: 20px;
   background-color: #0a0a0a;
 
@@ -337,4 +337,10 @@ const Name = styled(Link)`
     border-radius: 50%;
     margin: 0px 10px;
   }
+`
+
+const TrashIconHolder = styled(TrashIcon)`
+ width:24px;
+ height: 24px;
+ cursor:pointer;
 `

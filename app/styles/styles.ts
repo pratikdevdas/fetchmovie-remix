@@ -5,11 +5,11 @@ export const NavContainer = styled.div`
 `
 
 export const NavWrapper = styled.div`
-  height: 80px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   color: white;
+  padding: 24px 0;
 `
 
 // Homepage

@@ -26,8 +26,6 @@ export default function MovieList() {
   const [newPage, setNewPage] = useState(0)
   const navigate = useNavigate()
 
-  // console.log(wishlist, '-----------30')
-
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
       return
@@ -86,6 +84,7 @@ export default function MovieList() {
               wishlistId={wishlistId}
               secretId={secretId}
               genreId={genreId}
+              source=''
             />
           ))}
           {fetcher.state === 'loading' && <> </>}
