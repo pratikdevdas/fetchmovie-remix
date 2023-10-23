@@ -50,7 +50,6 @@ const HeartIconCover = styled(HeartIcon)`
 `
 const Counter = styled.div`
   position: absolute;
-  background-color: #f03e3e;
   width: 14px;
   height: 14px;
   left: 70%;
@@ -60,5 +59,5 @@ const Counter = styled.div`
  align-items: center;
  justify-content: center;
  font-size: 11px;
-padding-top: 2px;
+ padding-top: 2px;
  `
