@@ -2,11 +2,13 @@ import { styled } from 'styled-components'
 import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
 import type { loader } from '~/routes/_index'
-import { useLoaderData } from '@remix-run/react'
+import { useLoaderData, useLocation, useSearchParams } from '@remix-run/react'
 import { NavLink } from '@remix-run/react'
 
 const TabCarousel = ({ url, secUrl }: { url?: string; secUrl?: string }) => {
   const { genres } = useLoaderData<typeof loader>()
+  const [searchParam] = useSearchParams()
+  const activeGenre = searchParam.get('with_genres')
   const responsive = {
     desktop: {
       breakpoint: { max: 3000, min: 720 },
@@ -43,13 +45,13 @@ const TabCarousel = ({ url, secUrl }: { url?: string; secUrl?: string }) => {
             <Category key={g.id}>
               <NavLink
                 prefetch="intent"
-                to={`${
-                  url && secUrl
+                to={`${url && secUrl
                     ? `?with_genres=${g.id}&wl=${url}&sid=${secUrl}`
                     : `?with_genres=${g.id}`
-                }`}
+                  }`}
               >
-                {g.name}
+                {activeGenre === g.id.toString() ? <span style={{ 'textDecoration': 'underline' }}>{g.name}</span> : <span>{g.name}</span>}
+
               </NavLink>
             </Category>
           ))}
