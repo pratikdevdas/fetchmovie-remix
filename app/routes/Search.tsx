@@ -70,15 +70,12 @@ const Search = () => {
   useEffect(() => {
     const existingSession = window.localStorage.getItem('localUserWishlistData')
     if (debouncedQuery && !existingSession) {
-      setSearchParams({ q: debouncedQuery, movieId: movieTrailerId  })
+      setSearchParams({ q: debouncedQuery, movieId: movieTrailerId })
     }
-  else if (debouncedQuery && existingSession) {
-    const existingSessionJSON = JSON.parse(existingSession)
-    setSearchParams({ q: debouncedQuery, wid: existingSessionJSON.wishlistId, sid: existingSessionJSON.secretId, movieId: movieTrailerId })
-  }
-  // else if (movieTrailerId) {
-  //   setSearchParams({ movieId: movieTrailerId })
-  // }
+    else if (debouncedQuery && existingSession) {
+      const existingSessionJSON = JSON.parse(existingSession)
+      setSearchParams({ q: debouncedQuery, wid: existingSessionJSON.wishlistId, sid: existingSessionJSON.secretId, movieId: movieTrailerId })
+    }
     else {
       navigate('/')
     }
@@ -92,7 +89,7 @@ const Search = () => {
         <TopNavbar query={query} setQuery={setQuery} focus={true} url={url} secUrl={secUrl} />
         <SearchContainer>
           <span color="red">
-            {isDebouncing || navigation.state === 'loading'
+            {isDebouncing || navigation.state === 'submitting'
               ? 'searching...'
               : null}
           </span>

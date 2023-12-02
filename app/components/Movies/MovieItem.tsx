@@ -57,6 +57,7 @@ export const MovieItem = ({
         <CardBottom>
           <WatchButton>
             <Link
+              prefetch='intent'
               to={`?${ !source ? `&with_genres=${genreId}` : `q=${q}`}&movieId=${m.id}&wl=${wishlistId}&sid=${secretId}`}
             >
               <TrailerModal
