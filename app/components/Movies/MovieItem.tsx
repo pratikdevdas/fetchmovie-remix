@@ -18,7 +18,7 @@ export const MovieItem = ({
   secretId: string
   genreId?: string
   source: string
-  q?: string
+  q?: string | null
 }) => {
   const fetcher = useFetcher<typeof loader>()
   const { wishlist } = useLoaderData()
@@ -57,7 +57,7 @@ export const MovieItem = ({
         <CardBottom>
           <WatchButton>
             <Link
-              to={`?index&with_genres=${genreId}&movieId=${m.id}&wl=${wishlistId}&sid=${secretId}`}
+              to={`?${ !source ? `&with_genres=${genreId}` : `q=${q}`}&movieId=${m.id}&wl=${wishlistId}&sid=${secretId}`}
             >
               <TrailerModal
                 movieId={Number(m.id)}

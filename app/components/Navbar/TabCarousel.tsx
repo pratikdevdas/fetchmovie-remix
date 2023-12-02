@@ -2,7 +2,7 @@ import { styled } from 'styled-components'
 import Carousel from 'react-multi-carousel'
 import 'react-multi-carousel/lib/styles.css'
 import type { loader } from '~/routes/_index'
-import { useLoaderData, useLocation, useSearchParams } from '@remix-run/react'
+import { useLoaderData, useSearchParams } from '@remix-run/react'
 import { NavLink } from '@remix-run/react'
 
 const TabCarousel = ({ url, secUrl }: { url?: string; secUrl?: string }) => {

@@ -15,16 +15,19 @@ import styled from 'styled-components'
 import { uniq } from 'lodash'
 import { useEffect, useState } from 'react'
 import ShareModal from '~/components/Wishlist/ShareModal'
-// import { createClient } from '@supabase/supabase-js'
-// import { type Movie } from './_index.tsx'
 import styles from '../styles/styles.css'
 import { TrashIcon } from '@radix-ui/react-icons'
 
 export const getWishlist = async (id: string) => {
-  const redis = Redis.fromEnv()
-  const data = await redis.json.get(`wishlist${id}`, '$')
-  console.log(data,'stop re')
-  return data
+  try {
+    const redis = Redis.fromEnv()
+    const data = await redis.json.get(`wishlist${id}`, '$')
+    // console.log(data,'stop re')
+    return data
+  }
+  catch(error){
+    return console.log(error)
+  }
 }
 
 export type WishlistData = {

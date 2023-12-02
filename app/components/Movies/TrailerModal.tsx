@@ -1,7 +1,7 @@
 import * as Dialog from '@radix-ui/react-dialog'
 import { Cross2Icon } from '@radix-ui/react-icons'
 import WatchTrailer from '../Button/WatchTrailer'
-import { Link, useLoaderData, useNavigation } from '@remix-run/react'
+import { useLoaderData, useNavigate, useNavigation } from '@remix-run/react'
 import styled from 'styled-components'
 
 const TrailerModal = ({
@@ -16,8 +16,8 @@ const TrailerModal = ({
   secretId?: string
 }) => {
   const { movieTrailerId } = useLoaderData()
-  const navigate = useNavigation()
-
+  const navigation = useNavigation()
+  const navigate = useNavigate()
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
@@ -28,7 +28,7 @@ const TrailerModal = ({
         <ModalContainer className="DialogContent">
           <Dialog.Title className="DialogTitle">Edit profile</Dialog.Title>
           {movieId}
-          {navigate.state === 'loading' ? (
+          {navigation.state === 'loading' ? (
             <IFrameContainer />
           ) : (
             <IFrameContainer
@@ -49,13 +49,10 @@ const TrailerModal = ({
             </Dialog.Close>
           </div>
           <Dialog.Close asChild>
-            <Link
-              to={`?index&with_genres=${genreId}&wl=${wishlistId}&sid=${secretId}`}
-            >
-              <button className="IconButton" aria-label="Close">
-                <Cross2Icon />
-              </button>
-            </Link>
+
+            <button onClick={() => navigate(-1)} className="IconButton" aria-label="Close">
+              <Cross2Icon />
+            </button>
           </Dialog.Close>
         </ModalContainer>
       </Dialog.Portal>

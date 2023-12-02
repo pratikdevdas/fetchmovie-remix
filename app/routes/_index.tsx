@@ -59,7 +59,7 @@ const getMovieGenreList = async () => {
     const { genres } = await response.json()
     return genres
   } catch (error) {
-    console.log(error)
+    return console.log(error, ' error in fetching genre')
   }
 }
 
@@ -72,11 +72,11 @@ const getMovieList = async (page: number, genre?: number) => {
     const movies = await response.json()
     return movies
   } catch (error) {
-    console.log(error)
+    return console.log(error , 'error in fetching movies')
   }
 }
 
-const getTrailer = async (trailer: number) => {
+export const getTrailer = async (trailer: number) => {
   try {
     const url = `https://api.themoviedb.org/3/movie/${trailer}/videos`
     const response = await fetch(url, options)
@@ -86,7 +86,7 @@ const getTrailer = async (trailer: number) => {
     )
     return findTrailer ? findTrailer.key : []
   } catch (error) {
-    console.log(error)
+    return console.log(error)
   }
 }
 export async function loader({ request }: LoaderArgs) {
@@ -98,6 +98,13 @@ export async function loader({ request }: LoaderArgs) {
   const wishlistId = url.searchParams.get('wl')
   const genres: Genres[] = await getMovieGenreList()
   const movies: Movies = await getMovieList(Number(page), Number(genre))
+  if(!movies){
+    console.log(movies)
+    console.log('there is some error while fetching movies')
+  }
+  if(!genres){
+    console.log('there is some error while fetching genre')
+  }
   const wishlist: WishlistData[] = await getWishlist(
     wishlistId ? wishlistId : ''
   )

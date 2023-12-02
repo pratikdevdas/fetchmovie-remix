@@ -13,6 +13,17 @@ import { HomeContainer, MovieCardWrapper } from '~/styles/styles'
 import type { Movie } from './_index'
 import styled from 'styled-components'
 import { MovieItem } from '~/components/Movies/MovieItem'
+import styles from '../styles/styles.css'
+import { getTrailer } from './_index'
+
+export const links = () => {
+  return [
+    {
+      rel: 'stylesheet',
+      href: styles
+    }
+  ]
+}
 
 const options = {
   method: 'GET',
@@ -31,12 +42,16 @@ const getEntriesByQuerystring = async (q: string) => {
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const url = new URL(request.url)
-  const { q } = Object.fromEntries(url.searchParams)
+  const { q, movieId } = Object.fromEntries(url.searchParams)
+  console.log(q, movieId)
   const movies = await getEntriesByQuerystring(q)
-  console.log(q, 'q')
-  console.log(movies.results)
   if (!q) {
     json({ q, movies: [] })
+  }
+  if (movieId) {
+    const movieTrailerId = await getTrailer(Number(movieId))
+    const hex = json({ q, movies: movies.results, movieTrailerId })
+    return hex
   }
   return json({ q, movies: movies.results })
 }
@@ -46,24 +61,31 @@ const Search = () => {
   const [searchParams, setSearchParams] = useSearchParams()
   const [query, setQuery] = useState(searchParams.get('q'))
   const [debouncedQuery, isDebouncing] = useDebounce(query, 300)
+  const { movieTrailerId } = useLoaderData()
+
+  console.log(movieTrailerId)
 
   const navigation = useNavigation()
   const navigate = useNavigate()
   useEffect(() => {
     const existingSession = window.localStorage.getItem('localUserWishlistData')
     if (debouncedQuery && !existingSession) {
-      setSearchParams({ q: debouncedQuery })
+      setSearchParams({ q: debouncedQuery, movieId: movieTrailerId  })
     }
-      else if(debouncedQuery && existingSession){
-      const existingSessionJSON = JSON.parse(existingSession)
-      setSearchParams({ q: debouncedQuery, wid: existingSessionJSON.wishlistId, sid: existingSessionJSON.secretId })
-    } else {
+  else if (debouncedQuery && existingSession) {
+    const existingSessionJSON = JSON.parse(existingSession)
+    setSearchParams({ q: debouncedQuery, wid: existingSessionJSON.wishlistId, sid: existingSessionJSON.secretId, movieId: movieTrailerId })
+  }
+  // else if (movieTrailerId) {
+  //   setSearchParams({ movieId: movieTrailerId })
+  // }
+    else {
       navigate('/')
     }
-  }, [debouncedQuery, setSearchParams])
+  }, [debouncedQuery])
 
- const secUrl =  searchParams.get('sid')
- const url =  searchParams.get('wid')
+  const secUrl = searchParams.get('sid')
+  const url = searchParams.get('wid')
   return (
     <div>
       <HomeContainer>
@@ -96,4 +118,6 @@ export default Search
 
 const SearchContainer = styled.div`
   color: white;
+  z-index: -1;
 `
+
