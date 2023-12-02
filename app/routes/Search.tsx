@@ -6,7 +6,7 @@ import {
   useNavigation,
   useSearchParams
 } from '@remix-run/react'
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import TopNavbar from '~/components/Navbar/TopNavbar'
 import { useDebounce } from '~/hooks/useDebounce'
 import { HomeContainer, MovieCardWrapper } from '~/styles/styles'
@@ -15,6 +15,8 @@ import styled from 'styled-components'
 import { MovieItem } from '~/components/Movies/MovieItem'
 import styles from '../styles/styles.css'
 import { getTrailer } from './_index'
+import type { WishlistData } from './wishlist.$sid.$wid.admin'
+import { getWishlist } from './wishlist.$sid.$wid.admin'
 
 export const links = () => {
   return [
@@ -42,18 +44,19 @@ const getEntriesByQuerystring = async (q: string) => {
 
 export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const url = new URL(request.url)
-  const { q, movieId } = Object.fromEntries(url.searchParams)
-  console.log(q, movieId)
+  const { q, movieId, wl } = Object.fromEntries(url.searchParams)
   const movies = await getEntriesByQuerystring(q)
+  const wishlist: WishlistData[] = await getWishlist(
+    wl
+  )
   if (!q) {
     json({ q, movies: [] })
   }
   if (movieId) {
     const movieTrailerId = await getTrailer(Number(movieId))
-    const hex = json({ q, movies: movies.results, movieTrailerId })
-    return hex
+    return json({ q, movies: movies.results, movieTrailerId, wishlist })
   }
-  return json({ q, movies: movies.results })
+  return json({ q, movies: movies.results, wishlist })
 }
 
 const Search = () => {
@@ -63,18 +66,16 @@ const Search = () => {
   const [debouncedQuery, isDebouncing] = useDebounce(query, 300)
   const { movieTrailerId } = useLoaderData()
 
-  console.log(movieTrailerId)
-
   const navigation = useNavigation()
   const navigate = useNavigate()
-  useEffect(() => {
+  useLayoutEffect(() => {
     const existingSession = window.localStorage.getItem('localUserWishlistData')
     if (debouncedQuery && !existingSession) {
       setSearchParams({ q: debouncedQuery, movieId: movieTrailerId })
     }
     else if (debouncedQuery && existingSession) {
       const existingSessionJSON = JSON.parse(existingSession)
-      setSearchParams({ q: debouncedQuery, wid: existingSessionJSON.wishlistId, sid: existingSessionJSON.secretId, movieId: movieTrailerId })
+      setSearchParams({ q: debouncedQuery, wl: existingSessionJSON.wishlistId, sid: existingSessionJSON.secretId, movieId: movieTrailerId })
     }
     else {
       navigate('/')
@@ -82,7 +83,7 @@ const Search = () => {
   }, [debouncedQuery])
 
   const secUrl = searchParams.get('sid')
-  const url = searchParams.get('wid')
+  const url = searchParams.get('wl')
   return (
     <div>
       <HomeContainer>

@@ -19,8 +19,6 @@ export default function TopNavbar({
     secUrl = params.sid
     url = params.wid
   }
-
-
   const { wishlist } = useLoaderData<typeof loader>()
   console.log(wishlist)
   return (

@@ -4,7 +4,7 @@ import {
   useNavigate,
   useSearchParams
 } from '@remix-run/react'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { Movie, loader } from '~/routes/_index'
 import styled from 'styled-components'
 import MoviesInfiniteScroll from './InfiniteScroller'

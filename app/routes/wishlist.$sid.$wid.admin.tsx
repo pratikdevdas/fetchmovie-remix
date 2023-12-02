@@ -94,7 +94,6 @@ export const action: ActionFunction = async ({ request, params }) => {
         '$.movies',
         values.movieId
       )
-      console.log(values)
       return redirect(
         `/${values.source}?${values.q ? `q=${values.q}` : 'index'}&wl=${values.wishlistId}&sid=${values.secretId}&with_genres=${values.genreId}`
       )

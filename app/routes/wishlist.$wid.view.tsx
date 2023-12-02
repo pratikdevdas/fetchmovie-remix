@@ -43,7 +43,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   const movieList = uniq(wishlist[0].movies)
 
   // const fetchPromises = movieList.map
-  console.log(movieList)
   const movieDetailList = movieList.map((n) => {
     const singleMovieUrl = `${url}/${n}`
     return fetch(singleMovieUrl, options)

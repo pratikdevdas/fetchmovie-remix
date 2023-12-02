@@ -91,20 +91,12 @@ export const getTrailer = async (trailer: number) => {
 }
 export async function loader({ request }: LoaderArgs) {
   const url = new URL(request.url)
-  // console.log(request.cookies)
   const page = url.searchParams.get('page') || 1
   const genre = url.searchParams.get('with_genres')
   const movieId = url.searchParams.get('movieId')
   const wishlistId = url.searchParams.get('wl')
   const genres: Genres[] = await getMovieGenreList()
   const movies: Movies = await getMovieList(Number(page), Number(genre))
-  if(!movies){
-    console.log(movies)
-    console.log('there is some error while fetching movies')
-  }
-  if(!genres){
-    console.log('there is some error while fetching genre')
-  }
   const wishlist: WishlistData[] = await getWishlist(
     wishlistId ? wishlistId : ''
   )
