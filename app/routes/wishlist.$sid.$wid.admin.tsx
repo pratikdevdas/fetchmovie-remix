@@ -136,14 +136,15 @@ const Wishlist = () => {
   const [edit, setEdit] = useState(false)
   const params = useParams()
 
+  console.log(params)
   useEffect(() => {
-    if (params.sid && params.uid) {
+    if (params.sid && params.wid) {
       localStorage.setItem(
         'localUserWishlistData',
         JSON.stringify({ wishlistId: params.wid, secretId: params.sid })
       )
     }
-  }, [params])
+  }, [])
 
   if (!movies) {
     return (

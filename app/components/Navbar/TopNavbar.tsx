@@ -19,6 +19,8 @@ export default function TopNavbar({
     secUrl = params.sid
     url = params.wid
   }
+
+  console.log(secUrl, url)
   const { wishlist } = useLoaderData<typeof loader>()
   console.log(wishlist)
   return (
@@ -29,7 +31,7 @@ export default function TopNavbar({
       <SearchBar query={query} setQuery={setQuery} focus={focus} />
       <WishlistContainer>
         <Counter>{uniq(wishlist?.[0].movies).length}</Counter>
-        <Link to={`/wishlist/${secUrl}/${url}/admin`}><HeartIconCover /></Link>
+        {!secUrl && !url ? <></> : <Link to={`/wishlist/${secUrl}/${url}/admin`}><HeartIconCover /></Link>}
       </WishlistContainer>
     </NavWrapper>
   )

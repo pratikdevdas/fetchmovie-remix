@@ -7,8 +7,8 @@ import { useEffect, useState } from 'react'
 
 export default function Navbar() {
   const [search] = useSearchParams()
-  const url = search.get('wl') || 'none'
-  const secUrl = search.get('sid') || 'none'
+  const url = search.get('wl') || ''
+  const secUrl = search.get('sid') || ''
 
   const [query, setQuery] = useState(search.get('q') || '')
   const [debouncedQuery] = useDebounce(query, 1000)
