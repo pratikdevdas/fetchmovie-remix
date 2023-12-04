@@ -6,7 +6,7 @@ import {
   useNavigation,
   useSearchParams
 } from '@remix-run/react'
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import TopNavbar from '~/components/Navbar/TopNavbar'
 import { useDebounce } from '~/hooks/useDebounce'
 import { HomeContainer, MovieCardWrapper } from '~/styles/styles'
@@ -68,19 +68,18 @@ const Search = () => {
 
   const navigation = useNavigation()
   const navigate = useNavigate()
-  useLayoutEffect(() => {
+  useEffect(() => {
     const existingSession = window.localStorage.getItem('localUserWishlistData')
-    if (debouncedQuery && !existingSession) {
-      setSearchParams({ q: debouncedQuery, movieId: movieTrailerId })
-    }
-    else if (debouncedQuery && existingSession) {
-      const existingSessionJSON = JSON.parse(existingSession)
-      setSearchParams({ q: debouncedQuery, wl: existingSessionJSON.wishlistId, sid: existingSessionJSON.secretId, movieId: movieTrailerId })
+    const existingSessionJSON = JSON.parse(existingSession ? existingSession : '')
+    if (debouncedQuery) {
+      setSearchParams({ q: debouncedQuery, wl: existingSessionJSON.wishlistId || '', sid: existingSessionJSON.secretId || 'null', movieId: movieTrailerId })
     }
     else {
+      console.log('debouncer')
       navigate('/')
     }
   }, [debouncedQuery])
+
 
   const secUrl = searchParams.get('sid')
   const url = searchParams.get('wl')

@@ -45,7 +45,7 @@ export default function MovieList() {
     }
   }, [genreId])
 
-  useEffect(() => {
+   useEffect(() => {
     const existingSession = window.localStorage.getItem('localUserWishlistData')
     if (existingSession) {
       const existingSessionJSON = JSON.parse(existingSession)
@@ -77,7 +77,7 @@ export default function MovieList() {
         loading={fetcher.state === 'loading'}
       >
         <MovieCardWrapper>
-          {renderMovies.map((m) => (
+          {renderMovies.map((m) =>   (
             <MovieItem
               m={m}
               key={m.id}

@@ -20,18 +20,17 @@ export default function TopNavbar({
     url = params.wid
   }
 
-  console.log(secUrl, url)
   const { wishlist } = useLoaderData<typeof loader>()
-  console.log(wishlist)
+
   return (
     <NavWrapper>
       <LogoHeader>
-        <Link to={`/?wl=${url}&sid=${secUrl}`}>The Movie App</Link>
+        <Link prefetch='intent' to={`/?wl=${url}&sid=${secUrl}`}>The Movie App</Link>
       </LogoHeader>
       <SearchBar query={query} setQuery={setQuery} focus={focus} />
       <WishlistContainer>
         <Counter>{uniq(wishlist?.[0].movies).length}</Counter>
-        {!secUrl && !url ? <></> : <Link to={`/wishlist/${secUrl}/${url}/admin`}><HeartIconCover /></Link>}
+        {!secUrl && !url ? <></> : <Link prefetch='intent' to={`/wishlist/${secUrl}/${url}/admin`}><HeartIconCover /></Link>}
       </WishlistContainer>
     </NavWrapper>
   )
