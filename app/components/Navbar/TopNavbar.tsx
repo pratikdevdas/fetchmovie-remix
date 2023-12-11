@@ -27,7 +27,7 @@ export default function TopNavbar({
       <LogoHeader>
         <Link prefetch='intent' to={`/?wl=${url}&sid=${secUrl}`}>The Movie App</Link>
       </LogoHeader>
-      <SearchBar query={query} setQuery={setQuery} focus={focus} />
+      <SearchBar query={query} setQuery={setQuery} focus={focus} url={url} secUrl={secUrl}/>
       <WishlistContainer>
         <Counter>{uniq(wishlist?.[0].movies).length}</Counter>
         {!secUrl && !url ? <></> : <Link prefetch='intent' to={`/wishlist/${secUrl}/${url}/admin`}><HeartIconCover /></Link>}

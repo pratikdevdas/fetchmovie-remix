@@ -10,6 +10,7 @@ import {
 } from '@remix-run/react'
 import { createHead } from 'remix-island'
 import main from './styles/main.css'
+import { useEffect, useState } from 'react'
 
 export const links: LinksFunction = () => {
   return [
@@ -50,10 +51,22 @@ export const Head = createHead(() => (
 ))
 
 export default function App() {
+
+  const [wishlistId, setWishlistId] = useState(null)
+  const [secretWishlistId, setSecretWislistId] = useState(null)
+
+  useEffect(() => {
+    const existingSession = window.localStorage.getItem('localUserWishlistData')
+    if (existingSession) {
+      const existingSessionJSON = JSON.parse(existingSession ? existingSession : '')
+        setWishlistId(existingSessionJSON.wishlistId)
+        setSecretWislistId(existingSessionJSON.secretId)
+    }
+  }, [])
   return (
     <>
       <Head />
-      <Outlet />
+      <Outlet context={{ wishlistId, secretWishlistId }}/>
       {/* removed because scroll was going up on loading modal */}
       {/* <ScrollRestoration /> */}
       <Scripts />

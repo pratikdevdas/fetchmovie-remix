@@ -1,20 +1,31 @@
+import { Form, useSubmit } from '@remix-run/react'
 import { styled } from 'styled-components'
 
 export type SearchInputProps = {
   query: string
   setQuery: (value: string) => void
   focus?: boolean
+  url?: string
+  secUrl?: string
 }
-const SearchBar = ({ query, setQuery, focus }: SearchInputProps) => {
+const SearchBar = ({ query, url, secUrl }: SearchInputProps) => {
+
+  const submit = useSubmit()
   return (
     <Container>
-      <InputBar
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        autoFocus={focus}
-        placeholder="Search for a movie"
-        type="text"
-      />
+      <Form onChange={(e) => submit(e.currentTarget, {
+        action: '/search',
+      })}
+      >
+        <InputBar
+          defaultValue={query}
+          placeholder="Search for a movie"
+          type="text"
+          name="q"
+        />
+        {/* <input type="text" hidden name='wl' value={url}/> */}
+        {/* <input type="text" hidden name='sid' value={secUrl}/> */}
+      </Form>
       <Image src="/search.svg" alt="search-icon" srcSet="" />
     </Container>
   )

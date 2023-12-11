@@ -4,18 +4,18 @@ import styled from 'styled-components'
 import { type Movie } from '~/routes/_index'
 import type { loader } from '~/routes/wishlist.$sid.$wid.admin'
 import TrailerModal from './TrailerModal'
+import { v4 as uuidv4 } from 'uuid'
+
+const wishlistId = uuidv4()
+const secretId = uuidv4()
 
 export const MovieItem = ({
   m,
-  wishlistId,
-  secretId,
   genreId,
   source,
   q
 }: {
   m: Movie
-  wishlistId: string
-  secretId: string
   genreId?: string
   source: string
   q?: string | null

@@ -2,13 +2,10 @@ import type { LoaderFunction } from '@remix-run/node'
 import { json, type LoaderArgs } from '@remix-run/node'
 import {
   useLoaderData,
-  useNavigate,
   useNavigation,
-  useSearchParams
+  useOutletContext,
 } from '@remix-run/react'
-import { useEffect, useState } from 'react'
 import TopNavbar from '~/components/Navbar/TopNavbar'
-import { useDebounce } from '~/hooks/useDebounce'
 import { HomeContainer, MovieCardWrapper } from '~/styles/styles'
 import type { Movie } from './_index'
 import styled from 'styled-components'
@@ -46,9 +43,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const url = new URL(request.url)
   const { q, movieId, wl } = Object.fromEntries(url.searchParams)
   const movies = await getEntriesByQuerystring(q)
-  const wishlist: WishlistData[] = await getWishlist(
-    wl
-  )
+  const wishlist: WishlistData[] = await getWishlist(wl)
   if (!q) {
     json({ q, movies: [] })
   }
@@ -60,36 +55,18 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
 }
 
 const Search = () => {
-  const { movies } = useLoaderData<typeof loader>()
-  const [searchParams, setSearchParams] = useSearchParams()
-  const [query, setQuery] = useState(searchParams.get('q'))
-  const [debouncedQuery, isDebouncing] = useDebounce(query, 300)
-  const { movieTrailerId } = useLoaderData()
-
+  const { movies,q } = useLoaderData<typeof loader>()
   const navigation = useNavigation()
-  const navigate = useNavigate()
-  useEffect(() => {
-    const existingSession = window.localStorage.getItem('localUserWishlistData')
-    const existingSessionJSON = JSON.parse(existingSession ? existingSession : '')
-    if (debouncedQuery) {
-      setSearchParams({ q: debouncedQuery, wl: existingSessionJSON.wishlistId || '', sid: existingSessionJSON.secretId || 'null', movieId: movieTrailerId })
-    }
-    else {
-      console.log('debouncer')
-      navigate('/')
-    }
-  }, [debouncedQuery])
+  const { wishlistId, secretWishlistId } = useOutletContext()
 
-
-  const secUrl = searchParams.get('sid')
-  const url = searchParams.get('wl')
+  console.log(wishlistId, secretWishlistId)
   return (
     <div>
       <HomeContainer>
-        <TopNavbar query={query} setQuery={setQuery} focus={true} url={url} secUrl={secUrl} />
+        <TopNavbar query={q} focus={true} url={wishlistId} secUrl={secretWishlistId} />
         <SearchContainer>
           <span color="red">
-            {isDebouncing || navigation.state === 'submitting'
+            { navigation.state === 'submitting'
               ? 'searching...'
               : null}
           </span>
@@ -98,10 +75,8 @@ const Search = () => {
               <MovieItem
                 m={m}
                 key={m.id}
-                wishlistId={url || ''}
-                secretId={secUrl || ''}
                 source='search'
-                q={query}
+                q={q}
               />
             ))}
           </MovieCardWrapper>

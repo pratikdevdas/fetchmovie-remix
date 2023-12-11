@@ -1,19 +1,15 @@
 import {
   useFetcher,
   useLoaderData,
-  useNavigate,
   useSearchParams
 } from '@remix-run/react'
 import { useState, useEffect } from 'react'
 import type { Movie, loader } from '~/routes/_index'
 import styled from 'styled-components'
 import MoviesInfiniteScroll from './InfiniteScroller'
-import { v4 as uuidv4 } from 'uuid'
 import { MovieItem } from './MovieItem'
 import { MovieCardWrapper } from '~/styles/styles'
 
-const wishlistIdGenerate = uuidv4()
-const secretIdGenerate = uuidv4()
 
 export default function MovieList() {
   const { movies, page } = useLoaderData<typeof loader>()
@@ -21,10 +17,7 @@ export default function MovieList() {
   const [search] = useSearchParams()
   const genreId = search.get('with_genres') || 'none'
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
-  const [wishlistId, setWishlistId] = useState(wishlistIdGenerate)
-  const [secretId, setSecretId] = useState(secretIdGenerate)
   const [newPage, setNewPage] = useState(0)
-  const navigate = useNavigate()
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
@@ -45,20 +38,6 @@ export default function MovieList() {
     }
   }, [genreId])
 
-   useEffect(() => {
-    const existingSession = window.localStorage.getItem('localUserWishlistData')
-    if (existingSession) {
-      const existingSessionJSON = JSON.parse(existingSession)
-      setWishlistId(existingSessionJSON.wishlistId)
-      setSecretId(existingSessionJSON.secretId)
-      navigate(
-        `/?wl=${existingSessionJSON.wishlistId}&sid=${existingSessionJSON.secretId}`
-      )
-    } else {
-      navigate('/')
-    }
-  }, [])
-
   return (
     <MoviesContainer>
       <MoviesInfiniteScroll
@@ -66,8 +45,8 @@ export default function MovieList() {
           const pageToFetch = fetcher.data
             ? fetcher.data.page + 1
             : newPage
-            ? newPage + 1
-            : page + 1
+              ? newPage + 1
+              : page + 1
           setNewPage(pageToFetch)
           const query = genreId
             ? `?index&with_genres=${genreId}&page=${pageToFetch}`
@@ -77,12 +56,10 @@ export default function MovieList() {
         loading={fetcher.state === 'loading'}
       >
         <MovieCardWrapper>
-          {renderMovies.map((m) =>   (
+          {renderMovies.map((m) => (
             <MovieItem
               m={m}
               key={m.id}
-              wishlistId={wishlistId}
-              secretId={secretId}
               genreId={genreId}
               source=''
             />
