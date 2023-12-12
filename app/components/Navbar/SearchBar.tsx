@@ -23,8 +23,11 @@ const SearchBar = ({ query, url, secUrl }: SearchInputProps) => {
           type="text"
           name="q"
         />
-        {/* <input type="text" hidden name='wl' value={url}/> */}
-        {/* <input type="text" hidden name='sid' value={secUrl}/> */}
+        {secUrl && url && <>
+          <input type="text" hidden name='wl' value={url}/>
+          <input type="text" hidden name='sid' value={secUrl}/>
+        </>
+        }
       </Form>
       <Image src="/search.svg" alt="search-icon" srcSet="" />
     </Container>

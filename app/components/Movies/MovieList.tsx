@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react'
 import type { Movie, loader } from '~/routes/_index'
 import styled from 'styled-components'
 import MoviesInfiniteScroll from './InfiniteScroller'
-import { MovieItem } from './MovieItem'
+  import { MovieItem } from './MovieItem'
 import { MovieCardWrapper } from '~/styles/styles'
 
 

@@ -9,7 +9,7 @@ import TopNavbar from '~/components/Navbar/TopNavbar'
 import { HomeContainer, MovieCardWrapper } from '~/styles/styles'
 import type { Movie } from './_index'
 import styled from 'styled-components'
-import { MovieItem } from '~/components/Movies/MovieItem'
+import { MovieItem, type WishlistId } from '~/components/Movies/MovieItem'
 import styles from '../styles/styles.css'
 import { getTrailer } from './_index'
 import type { WishlistData } from './wishlist.$sid.$wid.admin'
@@ -45,7 +45,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const movies = await getEntriesByQuerystring(q)
   const wishlist: WishlistData[] = await getWishlist(wl)
   if (!q) {
-    json({ q, movies: [] })
+    json({ movies: [] })
   }
   if (movieId) {
     const movieTrailerId = await getTrailer(Number(movieId))
@@ -57,7 +57,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
 const Search = () => {
   const { movies,q } = useLoaderData<typeof loader>()
   const navigation = useNavigation()
-  const { wishlistId, secretWishlistId } = useOutletContext()
+  const { wishlistId, secretWishlistId } = useOutletContext<WishlistId>()
 
   console.log(wishlistId, secretWishlistId)
   return (

@@ -1,13 +1,14 @@
 import { HeartFilledIcon, HeartIcon } from '@radix-ui/react-icons'
-import { Link, useFetcher, useLoaderData } from '@remix-run/react'
+import { Link, useFetcher, useLoaderData, useOutletContext } from '@remix-run/react'
 import styled from 'styled-components'
 import { type Movie } from '~/routes/_index'
 import type { loader } from '~/routes/wishlist.$sid.$wid.admin'
 import TrailerModal from './TrailerModal'
-import { v4 as uuidv4 } from 'uuid'
 
-const wishlistId = uuidv4()
-const secretId = uuidv4()
+export type WishlistId = {
+  wishlistId : string
+  secretWishlistId : string
+}
 
 export const MovieItem = ({
   m,
@@ -22,22 +23,13 @@ export const MovieItem = ({
 }) => {
   const fetcher = useFetcher<typeof loader>()
   const { wishlist } = useLoaderData()
-  // wislist doesnt come on first reload so wait for it to come literally you  are giving some time to the effect to load data from localstorage first
-  // const [wMovies, setWMovies] = useState(wishlist ? wishlist?.[0]?.movies : [])
-  // console.log(wishlist?.[0]?.movies)
+  const { wishlistId, secretWishlistId } = useOutletContext<WishlistId>()
 
   const isWishlisting =
     Number(fetcher.formData?.get('movieId')) === m.id ||
     fetcher.state === 'submitting'
 
-  const handleSubmit = () => {
-    window.localStorage.setItem(
-      'localUserWishlistData',
-      JSON.stringify({ wishlistId, secretId })
-    )
-  }
 
-  // if(wishlist)
   return (
     <MovieCard key={m.id}>
       <img
@@ -58,23 +50,22 @@ export const MovieItem = ({
           <WatchButton>
             <Link
               prefetch='intent'
-              to={`?${ !source ? `&with_genres=${genreId}` : `q=${q}`}&movieId=${m.id}&wl=${wishlistId}&sid=${secretId}`}
+              to={`?${!source ? `&with_genres=${genreId}` : `q=${q}`}&movieId=${m.id}&wl=${wishlistId}&sid=${secretWishlistId}`}
             >
               <TrailerModal
                 movieId={Number(m.id)}
                 genreId={Number(genreId)}
                 wishlistId={wishlistId}
-                secretId={secretId}
+                secretId={secretWishlistId}
               />
             </Link>
           </WatchButton>
           <fetcher.Form
             method="post"
-            action={`/wishlist/${wishlistId}/${secretId}/admin`}
-            onSubmit={handleSubmit}
+            action={`/wishlist/${wishlistId}/${secretWishlistId}/admin`}
           >
             <input type="hidden" name="wishlistId" value={wishlistId} />
-            <input type="hidden" name="secretId" value={secretId} />
+            <input type="hidden" name="secretId" value={secretWishlistId} />
             <input type="hidden" name="movieId" value={Number(m.id)} />
             <input type="hidden" name="source" value={source ? source : ''} />
             <input type="hidden" name="q" value={q ? q : ''} />
@@ -95,7 +86,7 @@ export const MovieItem = ({
                   <HeartIcon
                     height={20}
                     width={20}
-                    // fill="currentColor"
+                  // fill="currentColor"
                   />
                 ) : (
                   <HeartFilled height={20} width={20} fill="currentColor" />
@@ -134,7 +125,7 @@ const WishListButton = styled.button`
 `
 const WatchButton = styled.button``
 
-const HeartFilled = styled(HeartFilledIcon)<{ fill?: string }>`
+const HeartFilled = styled(HeartFilledIcon) <{ fill?: string }>`
   font-size: 48px;
   color: violet;
   transition: all 1s ease-in-out;
