@@ -1,5 +1,5 @@
 import type { LoaderFunction } from '@remix-run/node'
-import { json, type LoaderArgs } from '@remix-run/node'
+import { json, redirect, type LoaderArgs } from '@remix-run/node'
 import {
   useLoaderData,
   useNavigation,
@@ -45,7 +45,7 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const movies = await getEntriesByQuerystring(q)
   const wishlist: WishlistData[] = await getWishlist(wl)
   if (!q) {
-    json({ movies: [] })
+    return redirect('/')
   }
   if (movieId) {
     const movieTrailerId = await getTrailer(Number(movieId))

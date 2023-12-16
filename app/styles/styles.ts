@@ -19,9 +19,10 @@ export const HomeContainer = styled.div`
 `
 
 // card wrapper
-export const MovieCardWrapper = styled.div`
+export const MovieCardWrapper = styled.div<{ $load?: boolean; }>`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   column-gap: 30px;
   row-gap: 20px;
+  opacity: ${props => props.$load  ? .5 : 1};
 `

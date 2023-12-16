@@ -1,5 +1,6 @@
-import { Form, useSubmit } from '@remix-run/react'
-import { styled } from 'styled-components'
+import { MagnifyingGlassIcon, UpdateIcon } from '@radix-ui/react-icons'
+import { Form, useNavigation, useSubmit } from '@remix-run/react'
+import { keyframes, styled } from 'styled-components'
 
 export type SearchInputProps = {
   query: string
@@ -10,7 +11,16 @@ export type SearchInputProps = {
 }
 const SearchBar = ({ query, url, secUrl }: SearchInputProps) => {
 
+
+  const navigation = useNavigation()
   const submit = useSubmit()
+
+  const searching =  navigation.location &&
+  new URLSearchParams(navigation.location.search).has(
+    'q'
+  )
+
+  console.log()
   return (
     <Container>
       <Form onChange={(e) => submit(e.currentTarget, {
@@ -28,8 +38,11 @@ const SearchBar = ({ query, url, secUrl }: SearchInputProps) => {
           <input type="text" hidden name='sid' value={secUrl}/>
         </>
         }
+        <IconContainer>
+          {searching && navigation.state === 'loading' ? <SearchRoll/> : <MagnifyingGlassIcon/>}
+        </IconContainer>
+
       </Form>
-      <Image src="/search.svg" alt="search-icon" srcSet="" />
     </Container>
   )
 }
@@ -56,9 +69,25 @@ const InputBar = styled.input`
   }
 `
 
-const Image = styled.img`
+const IconContainer= styled.div`
   position: absolute;
   right: 19.53px;
   top: 15px;
   bottom: 15px;
+`
+
+
+const rotate = keyframes`
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+`
+
+
+const SearchRoll = styled(UpdateIcon)`
+animation: ${rotate} 1s linear infinite;
 `

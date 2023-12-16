@@ -1,13 +1,14 @@
 import {
   useFetcher,
   useLoaderData,
+  useNavigation,
   useSearchParams
 } from '@remix-run/react'
 import { useState, useEffect } from 'react'
 import type { Movie, loader } from '~/routes/_index'
 import styled from 'styled-components'
 import MoviesInfiniteScroll from './InfiniteScroller'
-  import { MovieItem } from './MovieItem'
+import { MovieItem } from './MovieItem'
 import { MovieCardWrapper } from '~/styles/styles'
 
 
@@ -18,6 +19,7 @@ export default function MovieList() {
   const genreId = search.get('with_genres') || 'none'
   const [renderMovies, setRenderMovies] = useState<Movie[]>(movies)
   const [newPage, setNewPage] = useState(0)
+  const navigation = useNavigation()
 
   useEffect(() => {
     if (!fetcher.data || fetcher.state === 'loading') {
@@ -38,6 +40,8 @@ export default function MovieList() {
     }
   }, [genreId])
 
+  console.log(navigation, navigation.state)
+
   return (
     <MoviesContainer>
       <MoviesInfiniteScroll
@@ -55,7 +59,8 @@ export default function MovieList() {
         }}
         loading={fetcher.state === 'loading'}
       >
-        <MovieCardWrapper>
+        {/* location state is null for action redirects */}
+        <MovieCardWrapper $load={navigation.state === 'loading' && !navigation.location.state}>
           {renderMovies.map((m) => (
             <MovieItem
               m={m}

@@ -22,7 +22,6 @@ export const getWishlist = async (id: string) => {
   try {
     const redis = Redis.fromEnv()
     const data = await redis.json.get(`wishlist${id}`, '$')
-    // console.log(data,'stop re')
     return data
   }
   catch(error){
