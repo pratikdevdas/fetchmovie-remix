@@ -15,17 +15,26 @@ const SearchBar = ({ query, url, secUrl }: SearchInputProps) => {
   const navigation = useNavigation()
   const submit = useSubmit()
 
-  const searching =  navigation.location &&
-  new URLSearchParams(navigation.location.search).has(
-    'q'
-  )
+  const searching = navigation.location &&
+    new URLSearchParams(navigation.location.search).has(
+      'q'
+    )
 
   console.log()
   return (
     <Container>
-      <Form onChange={(e) => submit(e.currentTarget, {
-        action: '/search',
-      })}
+      <Form onChange={(e) => {
+        console.log((e.target as HTMLInputElement).value)
+        if (!((e.target as HTMLInputElement).value)) {
+         return submit((e.currentTarget), {
+            action: '/',
+          })
+        }
+        submit(e.currentTarget, {
+          action: '/search',
+        })
+      }
+      }
       >
         <InputBar
           defaultValue={query}
@@ -34,12 +43,12 @@ const SearchBar = ({ query, url, secUrl }: SearchInputProps) => {
           name="q"
         />
         {secUrl && url && <>
-          <input type="text" hidden name='wl' value={url}/>
-          <input type="text" hidden name='sid' value={secUrl}/>
+          <input type="text" hidden name='wl' value={url} />
+          <input type="text" hidden name='sid' value={secUrl} />
         </>
         }
         <IconContainer>
-          {searching && navigation.state === 'loading' ? <SearchRoll/> : <MagnifyingGlassIcon/>}
+          {searching && navigation.state === 'loading' ? <SearchRoll /> : <MagnifyingGlassIcon />}
         </IconContainer>
 
       </Form>
@@ -69,7 +78,7 @@ const InputBar = styled.input`
   }
 `
 
-const IconContainer= styled.div`
+const IconContainer = styled.div`
   position: absolute;
   right: 19.53px;
   top: 15px;
