@@ -44,9 +44,6 @@ export const loader: LoaderFunction = async ({ request }: LoaderArgs) => {
   const { q, movieId, wl } = Object.fromEntries(url.searchParams)
   const movies = await getEntriesByQuerystring(q)
   const wishlist: WishlistData[] = await getWishlist(wl)
-  if (!q) {
-    return redirect('/')
-  }
   if (movieId) {
     const movieTrailerId = await getTrailer(Number(movieId))
     return json({ q, movies: movies.results, movieTrailerId, wishlist })
