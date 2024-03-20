@@ -79,6 +79,7 @@ export default function App() {
         JSON.stringify({ wishlistId, secretId })
       )
       setWishlistId(wishlistId)
+      setSecretWishlistId(secretId)
       setSearchParams({ wl: wishlistId, sid: secretId })
     }
   }, [])
